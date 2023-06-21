@@ -1,0 +1,181 @@
+<html>
+  <head>
+    <title>Users</title>
+  </head>
+  <body>
+    <h1>Register:</h1>
+    <p></p>
+    <div id="divForm">
+      <p>
+        ID: <input type="text" name="userId" id="userId" value="0" readonly />
+      </p>
+      <p>
+        Username:<br /><input
+          type="text"
+          name="username"
+          id="username"
+          required
+        />
+      </p>
+      <p>
+        Last Name:<br /><input
+          type="text"
+          name="lastName"
+          id="lastName"
+          required
+        />
+      </p>
+      <p>
+        First Name:<br /><input
+          type="text"
+          name="firstName"
+          id="firstName"
+          required
+        />
+      </p>
+      <p>Email:<br /><input type="email" name="email" id="email" required /></p>
+      <p>
+        Password:<br /><input
+          type="password"
+          name="password1"
+          id="password1"
+          required
+        />
+      </p>
+      <p>
+        Confirm Password:<br /><input
+          type="password"
+          name="password2"
+          id="password2"
+          required
+        />
+      </p>
+      <p>
+        <br />
+        <button onclick="saveUser()">Save</button>
+        <button onclick="query()">Find</button>
+        <button onclick="newUser()">New</button>
+      </p>
+    </div>
+    <div id="divResponse"></div>
+  </body>
+  <script>
+    const users = <%- JSON.stringify(users) %>;
+    let currentUser;
+    const userId =  document.getElementById('userId');
+    const username = document.getElementById('username');
+    const lastName = document.getElementById('lastName');
+    const firstName = document.getElementById('firstName');
+    const email = document.getElementById('email');
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    const divResponse=  document.getElementById('divResponse');
+    async function query ()
+       {
+         const id=prompt("ID:");
+         const q = `{
+             user(id:${id}){
+    		userId
+               username
+    		email
+    		lastName
+    		firstName
+    		roleId
+    		status
+             }
+           }`;
+
+         const response = await fetch(`graphql`, {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             query: q,
+           }),
+         });
+         const responseText = await response.text();
+      console.log("responseText",responseText);
+         const responseData = JSON.parse(responseText);
+      const user =responseData.data.user;
+      console.log("USER",user);
+      if(user.length<1)
+      {
+    	alert("Not Found!");
+    	return;
+      }
+      currentUser=user[0];
+         console.log(currentUser);
+
+      userId.value=currentUser.userId;
+      username.value=currentUser.username;
+      lastName.value=currentUser.lastName;
+      firstName.value=currentUser.firstName;
+      email.value=currentUser.email;
+       }
+    function render ()
+    {
+    	let t='<table border="1"><tr><th>email</td></tr>';
+    	for (let i in users)
+    	{
+    		const row=users[i];
+    		console.log(row);
+    		let tr = `<tr><td><a href="javascript:editUser(${i})">${row.email}</a></td></tr>`;
+    		t+=tr;
+    	}
+    	divResponse.innerHTML=(t+"</table>");
+    }
+    async function saveUser()
+    {
+    	const id=userId.value;
+    	const un=username.value;
+    	const ln=lastName.value;
+    	const fn=firstName.value;
+    	const em =email.value;
+    	const pw1=password1.value;
+    	const pw2=password2.value;
+    	const request = `mutation {
+    		updateUser(userId: ${id}, username: "${un}", password1:"${pw1}", password2:"${pw2}",lastName:"${ln}", firstName:"${fn}", email:"${em}", roleId:2,status:1) {
+    		status
+    		id
+    		message
+    		level
+    		}
+    	}`;
+    	console.log("REQUEST:",request);
+    	//return;
+    	const response = await fetch(`graphql`, {
+    		method: 'POST',
+    		headers: { 'Content-Type': 'application/json' },
+    		body: JSON.stringify({
+    		  query: request,
+    		}),
+    	  });
+    	const responseText = await response.text();
+    	const responseData = JSON.parse(responseText);
+    	console.log (responseText, responseData);
+    	userId.value=responseData.id;
+    	 // currentUser = responseData.data.updateUser;
+    	userId.value=responseData.data.updateUser.id;
+    	console.log(responseData.data.updateUser)
+    	document.getElementById("divResponse").innerHTML=responseData.data.updateUser.message;
+    }
+    function editUser(idx)
+    {
+    	currentUser=users[idx];
+    	userId.value=currentUser.userId;
+    	username.value=currentUser.username;
+    	lastName.value=currentUser.lastName;
+    	firstName.value=currentUser.firstName;
+    	email.value=currentUser.email;
+    }
+    function newUser(idx)
+    {
+    	currentUser=null;
+    	userId.value=0;
+    	username.value="";
+    	lastName.value="";
+    	firstName.value="";
+    	email.value="";
+    }
+    render();
+  </script>
+</html>

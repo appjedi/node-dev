@@ -1,17 +1,17 @@
 const Koa = require('koa');
 const KoaRouter = require('koa-router');
 const mount = require('koa-mount');
-const render=require('koa-ejs');
+const render = require('koa-ejs');
 const { graphqlHTTP } = require('koa-graphql');
 const path = require('path');
 const MySql = require('sync-mysql');
 const {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLString,
-  GraphQLList,
-  GraphQLInt,
-  GraphQLNonNull
+	GraphQLSchema,
+	GraphQLObjectType,
+	GraphQLString,
+	GraphQLList,
+	GraphQLInt,
+	GraphQLNonNull
 } = require('graphql')
 const app = new Koa();
 const GC_RELEASE = "2023-06-21";
@@ -20,74 +20,74 @@ require("dotenv").config()
 
 const router = new KoaRouter();
 app.use(router.routes()).use(router.allowedMethods());
-const GC_CONN_IDX = 1;
+const GC_CONN_IDX = 0;
 let GC_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
 //console.log(GC_CONNECTIONS);
 const connection = new MySql(GC_CONNECTIONS[GC_CONN_IDX]);
 
-render(app,{
+render(app, {
 	root: path.join(__dirname, 'views'),
-	layout:'layout',
-	viewExt:'html',
-	cache:false,
-	debug:false
+	layout: 'layout',
+	viewExt: 'html',
+	cache: false,
+	debug: false
 });
-router.get("/home",async(ctx)=>{
+router.get("/home", async (ctx) => {
 	console.log("index");
 	await ctx.render("index");
 });
-router.get("/release",async(ctx)=>{
+router.get("/release", async (ctx) => {
 	console.log("release");
-	ctx.body=GC_RELEASE
+	ctx.body = GC_RELEASE
 });
-router.get("/reg",async(ctx)=>{
+router.get("/reg", async (ctx) => {
 	console.log("register");
 	const users = getUsers(0);
-	await ctx.render("register",{users:users});
+	await ctx.render("register", { users: users });
 });
-router.get("/users",async(ctx)=>{
+router.get("/users", async (ctx) => {
 	console.log("users");
 	const users = getUsers(0);
-	ctx.body=users;
+	ctx.body = users;
 });
-router.get("/user/:id",async(ctx)=>{
+router.get("/user/:id", async (ctx) => {
 	const id = ctx.params.id;
 	console.log("user", id);
 	const users = getUsers(id);
-	ctx.body=users;
+	ctx.body = users;
 });
 const UserType = new GraphQLObjectType({
-  name: 'User',
-  description: 'This represents users from MySQL database',
-  fields: () => ({
-    userId: { type: GraphQLNonNull(GraphQLInt) },
-    username: { type: GraphQLNonNull(GraphQLString) },
-    lastName: { type: GraphQLNonNull(GraphQLString) },
-	firstName: { type: GraphQLNonNull(GraphQLString) },
-	email: { type: GraphQLNonNull(GraphQLString) },
-	password: { type: GraphQLNonNull(GraphQLString) },
-	roleId: { type: GraphQLNonNull(GraphQLInt) },
-	status: { type: GraphQLNonNull(GraphQLInt) }
-  })
+	name: 'User',
+	description: 'This represents users from MySQL database',
+	fields: () => ({
+		userId: { type: GraphQLNonNull(GraphQLInt) },
+		username: { type: GraphQLNonNull(GraphQLString) },
+		lastName: { type: GraphQLNonNull(GraphQLString) },
+		firstName: { type: GraphQLNonNull(GraphQLString) },
+		email: { type: GraphQLNonNull(GraphQLString) },
+		password: { type: GraphQLNonNull(GraphQLString) },
+		roleId: { type: GraphQLNonNull(GraphQLInt) },
+		status: { type: GraphQLNonNull(GraphQLInt) }
+	})
 });
-const MessageType =  new GraphQLObjectType({
-  name: 'Message',
-  description: 'Generic Message',
-  fields: () => ({
-    id: { type: GraphQLNonNull(GraphQLInt) },
-    status: { type: GraphQLNonNull(GraphQLInt) },
-    level: { type: GraphQLNonNull(GraphQLInt) },
-    message: { type: GraphQLNonNull(GraphQLString) }
-  })
+const MessageType = new GraphQLObjectType({
+	name: 'Message',
+	description: 'Generic Message',
+	fields: () => ({
+		id: { type: GraphQLNonNull(GraphQLInt) },
+		status: { type: GraphQLNonNull(GraphQLInt) },
+		level: { type: GraphQLNonNull(GraphQLInt) },
+		message: { type: GraphQLNonNull(GraphQLString) }
+	})
 });
 const RootQueryType = new GraphQLObjectType({
-  name: 'Query',
-  description: 'Root Query',
-    fields: () => ({
+	name: 'Query',
+	description: 'Root Query',
+	fields: () => ({
 		users: {
 			type: new GraphQLList(UserType),
 			description: 'List of All Users',
-			
+
 			resolve: () => getUsers(0)
 		},
 		user: {
@@ -96,80 +96,81 @@ const RootQueryType = new GraphQLObjectType({
 			args: {
 				id: { type: GraphQLInt }
 			},
-			resolve: (parent,args) => getUsers(args.id)
-		}	
+			resolve: (parent, args) => getUsers(args.id)
+		}
 	})
 })
 
 const RootMutationType = new GraphQLObjectType({
-  name: 'Mutation',
-  description: 'Root Mutation',
-  fields: () => ({
-	  updateUser:{
-		/*
-		mutation {
-		  updateUser(userId: 2, username: "testerb", password:"Test1234",lastName:"Tester", firstName:"Bob", email:"tester.test@test.com", roleId:1,status:1) {
-				username
+	name: 'Mutation',
+	description: 'Root Mutation',
+	fields: () => ({
+		updateUser: {
+			/*
+			mutation {
+			  updateUser(userId: 2, username: "testerb", password:"Test1234",lastName:"Tester", firstName:"Bob", email:"tester.test@test.com", roleId:1,status:1) {
+					username
+				}
+			}
+			*/
+			type: MessageType,
+			description: 'Add/Update User',
+			args: {
+				userId: { type: GraphQLNonNull(GraphQLInt) },
+				username: { type: GraphQLNonNull(GraphQLString) },
+				password1: { type: GraphQLNonNull(GraphQLString) },
+				password2: { type: GraphQLNonNull(GraphQLString) },
+				lastName: { type: GraphQLNonNull(GraphQLString) },
+				firstName: { type: GraphQLNonNull(GraphQLString) },
+				email: { type: GraphQLNonNull(GraphQLString) },
+				roleId: { type: GraphQLNonNull(GraphQLInt) },
+				status: { type: GraphQLNonNull(GraphQLInt) }
+			},
+			resolve: (parent, args) => {
+				const resp = updateUser(args.userId, args.username, args.password1, args.password2, args.lastName, args.firstName, args.email, args.roleId, args.status)
+				console.log("RESP", resp);
+				// const ret={userId:args.userId, username:args.username, status:1, message:"Updated"}
+				return resp;
 			}
 		}
-		*/
-		type: MessageType,
-		description: 'Add/Update User',
-		args: {
-			userId: { type: GraphQLNonNull(GraphQLInt) },
-			username: { type: GraphQLNonNull(GraphQLString) },
-			password1: { type: GraphQLNonNull(GraphQLString) },
-			password2: { type: GraphQLNonNull(GraphQLString) },			
-			lastName: { type: GraphQLNonNull(GraphQLString) },
-			firstName: { type: GraphQLNonNull(GraphQLString) },
-			email: { type: GraphQLNonNull(GraphQLString) },
-			roleId: { type: GraphQLNonNull(GraphQLInt) },
-			status: { type: GraphQLNonNull(GraphQLInt) }
-		},
-		resolve: (parent, args) => {
-			const resp =updateUser(args.userId,args.username,args.password1,args.password2,args.lastName,args.firstName,args.email,args.roleId,args.status)
-			console.log("RESP",resp);
-			// const ret={userId:args.userId, username:args.username, status:1, message:"Updated"}
-			return resp;
-		}
-	}
-  })
+	})
 });
-function getUsers (id)
-{
-	let query ='SELECT * FROM view_users' + (id>0? " WHERE userId = "+id:"");
+function getUsers(id) {
+	let query = 'SELECT * FROM view_users' + (id > 0 ? " WHERE userId = " + id : "");
 	const results = connection.query(query);
 	return results;
 }
-function updateUser(userId,username,password1,password2,lastName,firstName,email,roleId,status)
-{
-	if (userId===0 && (password1 !==password2 || password1.length<8))
-	{
-		console.log ("PWD:", password1, password2,password2.length);
-		return {status:-1, message:"Invalid password or passwords don't match", id:0, level:2}
+function updateUser(userId, username, password1, password2, lastName, firstName, email, roleId, status) {
+	try {
+		if (userId === 0 && (password1 !== password2 || password1.length < 8)) {
+			console.log("PWD:", password1, password2, password2.length);
+			return { status: -1, message: "Invalid password or passwords don't match", id: 0, level: 2 }
+		}
+		const sp = "call usp_user_save (?,?,?,?,?,?,?,?)";
+		const data = [userId, username, password1, lastName, firstName, email, roleId, status];
+		console.log("updateUser.DATA:", data);
+		const results = connection.query(sp, data);
+		console.log("updateUser.result:", results[0][0]);
+		return results[0][0];
+	} catch (err) {
+		console.log("ERR:", err);
 	}
-	const sp = "call usp_user_save (?,?,?,?,?,?,?,?)";
-	const data = [userId,username,password1,lastName,firstName,email,roleId,status];
-	console.log ("DATA:",data);
-	const results = connection.query(sp, data);
-	console.log ("updateUser.result:",results[0][0]);
-	return results[0][0];
 }
 const schema = new GraphQLSchema({
-  query: RootQueryType,
-  mutation: RootMutationType
+	query: RootQueryType,
+	mutation: RootMutationType
 });
 app.use(
-  mount(
-    '/graphql',
-    graphqlHTTP({
-      schema: schema,
-      graphiql: true,
-    }),
-  ),
+	mount(
+		'/graphql',
+		graphqlHTTP({
+			schema: schema,
+			graphiql: true,
+		}),
+	),
 );
 
-const PORT=4000;
-app.listen(PORT,()=>{
-	console.log ("running on port: "+PORT);
+const PORT = 4000;
+app.listen(PORT, () => {
+	console.log("running on port: " + PORT);
 });

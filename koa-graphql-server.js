@@ -5,6 +5,18 @@ const render = require('koa-ejs');
 const { graphqlHTTP } = require('koa-graphql');
 const path = require('path');
 const MySql = require('sync-mysql');
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/test');
+var Schema = mongoose.Schema;
+
+var userDataSchema = new Schema({
+	email: { type: String, required: true },
+	password: String,
+	fullname: String,
+	favorites: [String]
+}, { collection: 'users' });
+
+var UserData = mongoose.model('UserData', userDataSchema);
 const {
 	GraphQLSchema,
 	GraphQLObjectType,
@@ -20,7 +32,7 @@ require("dotenv").config()
 
 const router = new KoaRouter();
 app.use(router.routes()).use(router.allowedMethods());
-const GC_CONN_IDX = 0;
+const GC_CONN_IDX = 1;
 let GC_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
 //console.log(GC_CONNECTIONS);
 const connection = new MySql(GC_CONNECTIONS[GC_CONN_IDX]);
@@ -39,6 +51,11 @@ router.get("/home", async (ctx) => {
 router.get("/release", async (ctx) => {
 	console.log("release");
 	ctx.body = GC_RELEASE
+});
+router.get("/mongo", async (ctx) => {
+	console.log("release");
+	const users = await mongo(1);
+	ctx.body = users
 });
 router.get("/reg", async (ctx) => {
 	console.log("register");
@@ -70,6 +87,7 @@ const UserType = new GraphQLObjectType({
 		status: { type: GraphQLNonNull(GraphQLInt) }
 	})
 });
+
 const MessageType = new GraphQLObjectType({
 	name: 'Message',
 	description: 'Generic Message',
@@ -97,10 +115,31 @@ const RootQueryType = new GraphQLObjectType({
 				id: { type: GraphQLInt }
 			},
 			resolve: (parent, args) => getUsers(args.id)
+		},
+		mongo: {
+			type: new GraphQLList(UserType),
+			description: 'List of User by id',
+			args: {
+				id: { type: GraphQLInt }
+			},
+			resolve: (async (parent, args) => mongo(args.id))
 		}
 	})
 })
+const mongo = async (id) => {
+	console.log("mongo: " + id);
+	const data = await UserData.find();
+	console.log("found", data);
+	const users = [];
+	for (let u of data) {
+		console.log ("U:",u);
+		const user = { userId: 0, username: u.email, lastName: u.fullname, firstName: u.fullname, email: u.email, password: "******", roleId: 1, status: 1 }
+		users.push(user);
+	}
 
+	console.log("USERS", users);
+	return users;
+}
 const RootMutationType = new GraphQLObjectType({
 	name: 'Mutation',
 	description: 'Root Mutation',
@@ -133,7 +172,8 @@ const RootMutationType = new GraphQLObjectType({
 				return resp;
 			}
 		}
-	})
+	}
+	)
 });
 function getUsers(id) {
 	let query = 'SELECT * FROM view_users' + (id > 0 ? " WHERE userId = " + id : "");

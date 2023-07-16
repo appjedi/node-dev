@@ -6,15 +6,10 @@ const KoaRouter = require('koa-router');
 const json = require('koa-json');
 const render = require('koa-ejs');
 const bodyParser = require('koa-bodyparser');
-const MySql = require('sync-mysql');
 const path = require('path');
 const session = require('koa-session');
-const {ObjectId} = require('mongodb'); // or ObjectID 
-
-const GC_CONN_IDX = 2;
-let GC_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
-// 
-const connection = new MySql(GC_CONNECTIONS[GC_CONN_IDX]);
+const MainDAO = require("./dao/DAOClass.js");
+const stripe = require('./services/stripe.mjs')
 // 
 const app = new Koa();
 const router = new KoaRouter();
@@ -24,13 +19,10 @@ app.keys = ['Shh, its a secret!'];
 app.use(session(app)); 
 app.use(json());
 app.use(bodyParser());
-const GC_RELEASE = "2023-05-31";
+const GC_RELEASE = "2023-07-16";
 // 
-const mongodb = require('mongodb');
-const MongoClient = require('mongodb').MongoClient;
-const GC_MONGO_PROD_URL = "mongodb+srv://appuser:AppData2022@cluster0.aga82.mongodb.net/wkk";
-const GC_MONGO_LOCAL_URL = "mongodb://127.0.0.1:27017/wkk";
-const GC_MONGO_URL = GC_MONGO_PROD_URL;
+const dao = new MainDAO(process.env.MONGO_URL);
+
 let ssn;
 const GC_STUDENTS = [];
 const GC_LEVELS = ['None', 'White', 'Yellow', 'Orange', 'Green', 'Blue', 'Purple', 'Brown 3rd', 'Brown 2nd', 'Brown 1st', 'Shodan', 'Nidan', 'Sandan'];
@@ -52,7 +44,7 @@ router.get("/", async (ctx) => {
     ctx.redirect("/login?msg=Please login");
     return;
   }
-  const s = await getStudents(0);
+  const s = await dao.getStudents(0);
   s.sort((a, b) => {
     const diff = b.rank - a.rank;
     if (diff !== 0)

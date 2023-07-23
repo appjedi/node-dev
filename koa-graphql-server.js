@@ -8,6 +8,7 @@ const MySql = require('sync-mysql');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/test');
 var Schema = mongoose.Schema;
+const { graphqlHTTP } = require("express-graphql") // CommonJS
 
 var userDataSchema = new Schema({
 	email: { type: String, required: true },
@@ -132,7 +133,7 @@ const mongo = async (id) => {
 	console.log("found", data);
 	const users = [];
 	for (let u of data) {
-		console.log ("U:",u);
+		console.log("U:", u);
 		const user = { userId: 0, username: u.email, lastName: u.fullname, firstName: u.fullname, email: u.email, password: "******", roleId: 1, status: 1 }
 		users.push(user);
 	}

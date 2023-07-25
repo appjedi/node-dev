@@ -10,6 +10,8 @@ const path = require('path');
 const session = require('koa-session');
 const MainDAO = require("./dao/DAOClass.js");
 const stripe = require('./services/stripe.mjs')
+import serve from "koa-static"; // CJS: require('koa-static')
+
 // 
 const app = new Koa();
 const router = new KoaRouter();
@@ -59,8 +61,8 @@ router.get("/", async (ctx) => {
   );
 });
 //  
-router.get("/add", async (ctx) => {
-  await ctx.render('add');
+router.get("/stripe", async (ctx) => {
+  await ctx.render('stripe');
 });
 router.get("/release", async (ctx) => {
    ctx.body=GC_RELEASE;

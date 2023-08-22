@@ -8,9 +8,11 @@ const render = require('koa-ejs');
 const bodyParser = require('koa-bodyparser');
 const path = require('path');
 const session = require('koa-session');
-const MainDAO = require("./dao/DAOClass.js");
-const stripe = require('./services/stripe.mjs')
-import serve from "koa-static"; // CJS: require('koa-static')
+const MainDAO = require("./dao/MainDAO.js");
+//const stripe = require('./services/stripe.mjs');
+const MainService = require('./services/service.js')
+
+//import serve from "koa-static"; // CJS: require('koa-static')
 
 // 
 const app = new Koa();
@@ -24,6 +26,8 @@ app.use(bodyParser());
 const GC_RELEASE = "2023-07-16";
 // 
 const dao = new MainDAO(process.env.MONGO_URL);
+const MySQL_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
+const service = new MainService(MySQL_CONNECTIONS[0]);
 
 let ssn;
 const GC_STUDENTS = [];
@@ -61,6 +65,20 @@ router.get("/", async (ctx) => {
   );
 });
 //  
+router.get("/videos", async (ctx) => {
+  const videos = await service.getVideos();
+  //ctx.body = videos;
+  await ctx.render('videos',
+    { videos: videos}
+  );
+});
+router.post("/video", async (ctx) => {
+  const video = ctx.request.body;
+  console.log("post.video:", video);
+  const result = await service.saveVideo(video);
+  //ctx.body = videos;
+   ctx.body=result;
+});
 router.get("/stripe", async (ctx) => {
   await ctx.render('stripe');
 });

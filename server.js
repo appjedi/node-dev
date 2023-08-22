@@ -5,8 +5,8 @@ const path = require('path');
 const GC_CONNECTIONS = [{
   host: 'localhost',
   user: 'root',
-  database: 'training',
-  password: 'Data1234'
+  database: 'dev',
+  password: 'Jedi2023'
 },
 {
   host: 'appdojo.net',
@@ -21,7 +21,7 @@ const GC_CONNECTIONS = [{
   port: 3306
 }
 ];
-const GC_CONN_IDX = 1;
+const GC_CONN_IDX = 0;
 const connection = new MySql(GC_CONNECTIONS[GC_CONN_IDX]);
 const port = 3000;
 const bodyParser = require('body-parser');
@@ -50,7 +50,7 @@ const storeItems = new Map([
   [3, { priceInCents: 20, name: "Learn CSS Today" }],
 ])
 let ssn;
-const GC_RELEASE = "2023-01-28";
+const GC_RELEASE = "2023-08-05";
 app.get("/release", (req, res) => {
   ssn = req.session;
   res.send(GC_RELEASE);

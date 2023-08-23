@@ -8,12 +8,13 @@
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <style>
-      td, th{
-        border:solid;
-        padding:5px;
+      td,
+      th {
+        border: solid;
+        padding: 5px;
       }
     </style>
-   
+
     <script>
       const videos = <%-JSON.stringify(videos)%>;
       const GC_URL="http://localhost:3000/";
@@ -31,45 +32,48 @@
             eventId:1
           }
           console.log ("SAVE DATA:", data);
-          const resp = await fetch (GC_URL+"video", {
-          method:"post",
-          headers:{
-            'Content-Type':"application/json"
-          },
-          body: JSON.stringify(data)
-        })
+          const resp = await fetch (GC_URL+"video",
+          {
+            method:"post",
+            headers:{
+              'Content-Type':"application/json"
+            },
+            body: JSON.stringify(data)
+          })
         const json = await resp.json();
         console.log(json);
- 
-      }
-     
 
+      }
+      function pageLoad(){
+        displayVideos();
+      }
+      function displayVideos()
+      {
+        console.log("VIDEOS", videos);
+        let content="";
+        for (let row of videos)
+        {
+          console.log(row);
+            const tr = `<tr><td><a href='${row.url}' target="_video">${row.title}</a></td></tr>`;
+            content+=tr;
+        }
+        console.log ("content",content)
+        tboydId.innerHTML=content;
+      }
     </script>
   </head>
   <body onload="pageLoad()">
-
     <h2>New Student:</h2>
     <div id="form1">
       <p>
-        <input
-          type="text"
-          name="title"
-          id="title"
-          placeholder="title"
-        />
+        <input type="text" name="title" id="title" placeholder="title" />
       </p>
       <p>
-        <input
-          type="text"
-          name="url"
-          id="url"
-          placeholder="url"
-        />
+        <input type="text" name="url" id="url" placeholder="url" />
       </p>
       <p>
         <select id="hostedBy" name="hostedBy">
           <option value="0">YouTube</option>
-
         </select>
       </p>
       <p>
@@ -86,16 +90,23 @@
           <option value="2">Not Current</option>
         </select>
       </p>
-      <p><button id="btnSave" onClick="save()">Add</button>
-    </p>
-    </form>
-  </div>
+      <p><button id="btnSave" onClick="save()">Add</button></p>
+    </div>
+    <div id="divTable">
+      <table>
+        <tr>
+          <th>Title</th>
+        </tr>
+        <tbody id="tboydId"></tbody>
+      </table>
+    </div>
   </body>
   <script>
     const title = document.getElementById("title");
     const url = document.getElementById("url");
     const source = document.getElementById("source");
     const videoDate = document.getElementById("videoDate");
+    const tboydId = document.getElementById("tboydId");
 
     const status = document.getElementById("status");
   </script>

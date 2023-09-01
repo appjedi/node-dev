@@ -4,7 +4,6 @@ const mount = require('koa-mount');
 const render = require('koa-ejs');
 const { graphqlHTTP } = require('koa-graphql');
 const path = require('path');
-const MySql = require('sync-mysql');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/test');
 var Schema = mongoose.Schema;

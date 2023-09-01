@@ -18,18 +18,31 @@
     <script>
       const videos = <%-JSON.stringify(videos)%>;
       const GC_URL="http://localhost:3000/";
+      let GV_VIDEO_ID=0;
+      let GV_VIDEO_OBJ;
+      function editVideo(idx)
+      {
+          GV_VIDEO_OBJ=videos[idx];
+          console.log (idx, ") editVideo", GV_VIDEO_OBJ);
+          GV_VIDEO_ID=GV_VIDEO_OBJ.id;
+          title.value=GV_VIDEO_OBJ.title;
+          url.value=GV_VIDEO_OBJ.url;
+          videoDate.value=GV_VIDEO_OBJ.video_date;
+          status.value=GV_VIDEO_OBJ.status;
 
+      }
       async function save()
       {
           const data = {
-            id:0,
+            id:GV_VIDEO_ID,
             title:title.value,
             url:url.value,
             videoDate:videoDate.value,
             sortOrder:1,
             hostedBy:1,
             sectionId:1,
-            eventId:1
+            eventId:1,
+            status:status.value
           }
           console.log ("SAVE DATA:", data);
           const resp = await fetch (GC_URL+"video",
@@ -51,15 +64,17 @@
       {
         console.log("VIDEOS", videos);
         let content="";
+        let idx=0;
         for (let row of videos)
         {
           console.log(row);
-            const tr = `<tr><td><a href='${row.url}' target="_video">${row.title}</a></td></tr>`;
+            const tr = `<tr><td><a href='javascript:editVideo(${idx})'>${row.title}</a></td></tr>`;
             content+=tr;
         }
         console.log ("content",content)
         tboydId.innerHTML=content;
       }
+
     </script>
   </head>
   <body onload="pageLoad()">

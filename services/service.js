@@ -18,10 +18,15 @@ class MainService {
         console.log("console", $data);
         //  usp_video_save (0,'test.com', '2023-08-01','TITLE','source',1,1,1,1,1,1)
         const sp = "call usp_video_save (?,?,?,?,?,?,?,?,?,?,?)"; 
-        const values = [$data['id'], $data['url'], $data['videoDate'], $data['title'],"src", $data['sortOrder'], $data['hostedBy'], $data['sectionId'], $data['eventId'],1,1];
+        const values = [$data['id'], $data['url'], $data['videoDate'], $data['title'],"src", $data['sortOrder'], $data['hostedBy'], $data['sectionId'], $data['eventId'],$data['status'],1];
         console.log("values",values);
         const result = this.dao.execute(sp, values);
         console.log("result", result);
         return result;
     }
+    query = async (query, values)=>{
+        const result = await this.dao.query(query,values);
+        console.log ("result",result)
+        return result;
+    }   
 }

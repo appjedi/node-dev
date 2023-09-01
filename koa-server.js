@@ -27,7 +27,7 @@ const GC_RELEASE = "2023-07-16";
 // 
 const dao = new MainDAO(process.env.MONGO_URL);
 const MySQL_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
-const service = new MainService(MySQL_CONNECTIONS[0]);
+const service = new MainService(MySQL_CONNECTIONS[2]);
 
 let ssn;
 const GC_STUDENTS = [];
@@ -92,8 +92,8 @@ async function amort(ctx) {
 router.get("/hello/:name", async (ctx) => {
     ctx.body = "Hello " + ctx.params.name;
 });
-router.get("/dbtest", (ctx) => {
-  const results = connection.query('SELECT * FROM users');
+router.get("/dbtest", async(ctx) => {
+  const results = await service.query('SELECT * FROM logger',null);
 
   ctx.body=results;
 });

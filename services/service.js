@@ -6,12 +6,26 @@ module.exports =
         constructor(connObj) {
             console.log("connObj", connObj);
             this.dao = new MyDAO(connObj);
+            
+            this.mainDAO = new MainDAO();
         }
 
-        getVideos = async () => {
-            const results = await this.dao.query("SELECT * FROM view_videos ORDER BY id DESC LIMIT 50");
+        getVideosSQL = async () => {
+            const results = await this.dao.query("SELECT * FROM view_videos ");
             //   console.log("getVideos", results);
             return results;
+        }
+        getVideos=async(id)=>{
+            /*
+            console.log("service.getVideos")
+            const videos=await this.getVideosSQL();
+            for (let v of videos)
+            {
+                await this.mainDAO.addVideo(v);
+            }
+            */
+            const videos = await this.mainDAO.getVideos(id);
+            return videos;
         }
         saveVideo = async (data) => {
             console.log("console", data);

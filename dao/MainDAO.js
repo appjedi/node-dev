@@ -157,6 +157,28 @@ module.exports =
                 return { status: -1 };
             }
         }
+        updateVideo =async (v)=>{
+            try {
+                const id = v.id;
+                const video={
+                    title: v.title,
+                    url: v.url,
+                    videoDate: v.videoDate,
+                    categoryId: v.categoryId,
+                    eventId: v.eventId,
+                    status: v.status,
+                    hostedBy: v.hostedBy,
+                    sectionId: v.sectionId,
+                    sortOrder: v.sortOrder,
+                    source: v.source,
+                }
+                await this.VideoData.findOneAndUpdate({ id: id }, video);
+
+            }catch (e) {
+                console.log(e);
+                return { status: -1 };
+            }
+        }
         updateUser = async (userId, password1, password2, lastName, firstName, email, roleId, status) => {
             try {
                 if (password1 !== password2 || (password1 + "").length < 8) {
@@ -177,6 +199,9 @@ module.exports =
                 return { status: -1 };
             }
             return { status: -1 };
+        }
+        addVideo=async(video)=>{
+            const resp=await this.VideoData.create(video);
         }
         getDonations = async (email) => {
             const donations = await this.DonationData.find({ email: email })
@@ -229,6 +254,14 @@ module.exports =
             const query = id === 0 ? {} : { _id: id };
             console.log("getStudents v2:", query);
             const data = await this.StudentData.find(query);
+            //const donations = data ? data.donations : [];
+            return data;
+        }
+        getVideos = async (id) => {
+            const query = id===0 ? {} : { id: id };
+            console.log("getVideos:", query);
+            const data = await this.VideoData.find(query);
+            console.log ("getVideos",data)
             //const donations = data ? data.donations : [];
             return data;
         }

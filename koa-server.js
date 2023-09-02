@@ -26,7 +26,7 @@ app.use(json());
 app.use(bodyParser());
 const GC_RELEASE = "2023-07-16";
 // 
-const dao = new MainDAO(process.env.MONGO_URL);
+//const dao = new MainDAO(process.env.MONGO_URL);
 const MySQL_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
 const service = new MainService(MySQL_CONNECTIONS[2]);
 
@@ -66,7 +66,7 @@ router.get("/", async (ctx) => {
 });
 //  
 router.get("/videos", async (ctx) => {
-  const videos = await service.getVideos();
+  const videos = await service.getVideos(0);
   //ctx.body = videos;
   await ctx.render('videos',
     { videos: videos }

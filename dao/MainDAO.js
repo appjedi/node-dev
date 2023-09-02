@@ -27,6 +27,24 @@ module.exports =
             }, { collection: 'users' });
             this.UserData = mongoose.model('UserData', this.userDataSchema);
 
+            this.videoDataSchema = new Schema({
+                id: Number,
+                title: String,
+                url: String,
+                videoDate: String,
+                categoryId: Number,
+                eventId: String,
+                firstName: String,
+                status: Number,
+                hostedBy: Number,
+                inserted: String,
+                sectionId: Number,
+                sortOrder: Number,
+                source: String,
+                status: Number
+            }, { collection: 'videos' });
+            this.VideoData = mongoose.model('VideoData', this.videoDataSchema);
+
             this.studentDataSchema = new Schema({
                 email: { type: String, required: true },
                 id: Number,

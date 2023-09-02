@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {ObjectId} = require('mongodb'); // or ObjectID 
+const { ObjectId } = require('mongodb'); // or ObjectID 
 module.exports =
     class MainDAO {
         constructor(url) {
@@ -29,7 +29,7 @@ module.exports =
                 id: String,
                 userId: String,
                 email: String,
-                fullName:String,
+                fullName: String,
                 amount: Number,
                 status: Number,
                 paid: String,
@@ -49,14 +49,14 @@ module.exports =
                 const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
                 var dbo = db.db(GC_MONGO_DB_NAME);
                 const rows = await dbo.collection("students").find(query).toArray();
-            //  console.log(id, "ROWS:", rows);
+                //  console.log(id, "ROWS:", rows);
                 db.close();
                 console.log("conn closed");
                 if (rows)
-                return id === 0 ? rows : rows[0];
+                    return id === 0 ? rows : rows[0];
                 else
-                return null;
-            
+                    return null;
+
             } catch (e) {
                 console.log(e);
                 return null;
@@ -104,7 +104,7 @@ module.exports =
             console.log("getDonations", donations);
             return donations;
         }
-        addDonation = async (email,fullName, amount) => {
+        addDonation = async (email, fullName, amount) => {
             try {
                 const user = await this.getUserByEmail(email);
                 console.log("addDonation.user:", email, user);
@@ -115,7 +115,7 @@ module.exports =
                     id: id,
                     userId: userId,
                     email: email,
-                    fullName:fullName,
+                    fullName: fullName,
                     amount: amount,
                     status: 0,
                     posted: new Date(),
@@ -167,14 +167,14 @@ module.exports =
             }
         }
         dbAuth = async (username, password) => {
-            const data = await this.UserData.find({ email: username });
+            const data = await this.UserData.find({ username: username });
             if (!data) {
-                return { status: -1, message: "Not Found" }
+                return { status: -1, message: "Not Found", userId: -1 }
             }
             if (data[0].password !== password) {
-                return { status: -2, message: "Invalid password" }
+                return { status: -2, message: "Invalid password", userId: -1 }
             }
-            const user = { name: data[0].email, status: 1, message: "Authenticated", userId: data[0]._id };
+            const user = { name: data[0].username, status: 1, message: "Authenticated", userId: data[0].id };
             return user;
 
         }

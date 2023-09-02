@@ -11,7 +11,8 @@ const session = require('koa-session');
 const MainDAO = require("./dao/MainDAO.js");
 //const stripe = require('./services/stripe.mjs');
 const MainService = require('./services/service.js')
-
+const mongodb = require('mongodb');
+const MongoClient = require('mongodb').MongoClient;
 //import serve from "koa-static"; // CJS: require('koa-static')
 
 // 
@@ -50,6 +51,7 @@ router.get("/", async (ctx) => {
     return;
   }
   const s = await dao.getStudents(0);
+  // console.log(s);
   s.sort((a, b) => {
     const diff = b.rank - a.rank;
     if (diff !== 0) {
@@ -273,6 +275,7 @@ const postAttendance = async (list) => {
 const getStudent = async (id) => {
   try {
     const query = id === 0 ? {} : { _id: new ObjectId(id) };
+    console.log("GC_MONGO_URL", GC_MONGO_URL);
     const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
     var dbo = db.db(GC_MONGO_DB_NAME);
     const row = await dbo.collection("students").find(query).toArray();

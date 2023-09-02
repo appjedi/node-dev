@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongodb'); // or ObjectID 
+const mongodb = require('mongodb');
+const MongoClient = require('mongodb').MongoClient;
 module.exports =
     class MainDAO {
         constructor(url) {
@@ -23,8 +25,24 @@ module.exports =
                 roleid: Number,
                 donations: Array
             }, { collection: 'users' });
-
             this.UserData = mongoose.model('UserData', this.userDataSchema);
+
+            this.studentDataSchema = new Schema({
+                email: { type: String, required: true },
+                id: Number,
+                age: Number,
+                attended: Number,
+                email: String,
+                parentGuardian: String,
+                phoneNumber: String,
+                startDate: String,
+                status: Number,
+                rank: Number,
+                attendance: Array
+            }, { collection: 'students' });
+
+            this.StudentData = mongoose.model('StudentData', this.studentDataSchema);
+
             this.donationSchema = new Schema({
                 id: String,
                 userId: String,
@@ -43,11 +61,12 @@ module.exports =
             }, { collection: 'key_values' });
             this.KeyValueData = mongoose.model('KeyValueData', this.keyValueSchema);
         }
-        getStudents = async (id) => {
+        getStudents_v1 = async (id) => {
             try {
                 const query = id === 0 ? {} : { _id: id };
-                const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-                var dbo = db.db(GC_MONGO_DB_NAME);
+                const url = this.getConnURL();
+                const db = await MongoClient.connect(url, { useUnifiedTopology: true });
+                var dbo = db.db("wkk");
                 const rows = await dbo.collection("students").find(query).toArray();
                 //  console.log(id, "ROWS:", rows);
                 db.close();
@@ -77,6 +96,48 @@ module.exports =
 
             console.log("updateFromStripe.ID:", id);
             return "updated";
+        }
+        postAttendance = async (list) => {
+            /*
+              const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
+              const dbo = db.db(GC_MONGO_DB_NAME);
+              const doc = await dbo.collection("students");
+           */
+            const doc = await getDocument("students");
+            for (row of list) {
+                console.log("ROW:", row);
+                const s = await getStudents(row.id);
+                if (s) {
+                    console.log("STUDENT:", s)
+                    const posted = new Date();
+                    const rec = { classDate: row.classDate, dojoId: row.dojoId, posted: posted }
+                    if (!s["attendance"]) {
+                        s["attendance"] = [];
+                    }
+                    console.log("POSTING: ", rec);
+                    s.attendance.push(rec);
+                    await this.StudentData.findOneAndUpdate({ id: id }, { attendance: s.attendance });
+                }
+            }
+        }
+        updateStudent = async (student) => {
+            try {
+                const id = student.id;
+                const data = {
+                    name: student.name,
+                    parentGuardian: student.parentGuardian,
+                    age: student.age,
+                    email: student.email,
+                    phoneNumber: student.phone,
+                    rank: student.rank,
+                    startDate: student.startDate,
+                    status: student.status
+                }
+                await this.StudentData.findOneAndUpdate({ id: id }, { status: status, paid: paid });
+            } catch (e) {
+                console.log(e);
+                return { status: -1 };
+            }
         }
         updateUser = async (userId, password1, password2, lastName, firstName, email, roleId, status) => {
             try {
@@ -145,6 +206,13 @@ module.exports =
                 users.push(user);
             }
             return users;
+        }
+        getStudents = async (id) => {
+            const query = id === 0 ? {} : { _id: id };
+            console.log("getStudents v2:", query);
+            const data = await this.StudentData.find(query);
+            //const donations = data ? data.donations : [];
+            return data;
         }
         getUserById = async (id) => {
             const user = await this.UserData.findById(id);

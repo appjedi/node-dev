@@ -60,14 +60,14 @@ module.exports =
             };
 
             transporter.sendMail(mailOptions, function(error, info){
-            if(error){
-                console.log(error);
-                return { status: -1, message: "error sending email" };
-            }else{
-                return {
-                    status: 1, message: "Email sent: " + info.response
-                };
-            }
+                if(error){
+                    console.log(error);
+                    return { status: -1, message: "error sending email" };
+                }else{
+                    return {
+                        status: 1, message: "Email sent: " + info.response
+                    };
+                }
             });
         }
     }

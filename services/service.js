@@ -12,62 +12,74 @@ module.exports =
         }
 
         getVideosSQL = async () => {
+            try{
             const results = await this.dao.query("SELECT * FROM view_videos ");
             //   console.log("getVideos", results);
-            return results;
+                return results;
+            } catch (e) {
+                return {status:-1, message:"error"}
+            } 
         }
         getVideos = async (id) => {
-            /*
-            console.log("service.getVideos")
-            const videos=await this.getVideosSQL();
-            for (let v of videos)
-            {
-                await this.mainDAO.addVideo(v);
+            try{
+                const videos = await this.mainDAO.getVideos(id);
+                return videos;
+            } catch (e) {
+                return {status:-1, message:"error"}
             }
-            */
-            const videos = await this.mainDAO.getVideos(id);
-            return videos;
         }
         saveVideo = async (data) => {
-            console.log("console", data);
-            //  usp_video_save (0,'test.com', '2023-08-01','TITLE','source',1,1,1,1,1,1)
-            const sp = "call usp_video_save (?,?,?,?,?,?,?,?,?,?,?)";
-            const values = [data['id'], data['url'], data['videoDate'], data['title'], "src",
-            data['hostedBy'], data['categoryId'], data['sectionId'], data['eventId'], data['status'], data['sortOrder']];
-            console.log("values", values);
-            const result = this.dao.execute(sp, values);
-            console.log("result", result);
-            return result;
+            try {
+                console.log("console", data);
+                //  usp_video_save (0,'test.com', '2023-08-01','TITLE','source',1,1,1,1,1,1)
+                const sp = "call usp_video_save (?,?,?,?,?,?,?,?,?,?,?)";
+                const values = [data['id'], data['url'], data['videoDate'], data['title'], "src",
+                data['hostedBy'], data['categoryId'], data['sectionId'], data['eventId'], data['status'], data['sortOrder']];
+                console.log("values", values);
+                const result = this.dao.execute(sp, values);
+                console.log("result", result);
+                return result;
+            } catch (e) {
+                return {status:-1, message:"error"}
+            }
         }
         query = async (query, values) => {
-            const result = await this.dao.query(query, values);
-            console.log("result", result)
-            return result;
+            try{
+                const result = await this.dao.query(query, values);
+                console.log("result", result)
+                return result;
+            } catch (e) {
+                return {status:-1, message:"error"}
+            }
         }
-        sendmail = async (to, subject, message) => {
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: "appjedi.net@gmail.com",
-                    pass: "dekxwtulmsryovls"
-                }
-            });
-            const mailOptions = {
-                from: "appjedi.net@gmail.com",
-                to: to,
-                subject: subject,
-                html: message
-            };
+        sendMail = async (to, subject, message) => {
+            try {
+                const transporter = nodemailer.createTransport({
+                    service: "gmail",
+                    auth: {
+                        user: "appjedi.net@gmail.com",
+                        pass: "dekxwtulmsryovls"
+                    }
+                });
+                const mailOptions = {
+                    from: "appjedi.net@gmail.com",
+                    to: to,
+                    subject: subject,
+                    html: message
+                };
 
-            transporter.sendMail(mailOptions, function(error, info){
-                if(error){
-                    console.log(error);
-                    return { status: -1, message: "error sending email" };
-                }else{
-                    return {
-                        status: 1, message: "Email sent: " + info.response
-                    };
-                }
-            });
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        console.log(error);
+                        return { status: -1, message: "error sending email" };
+                    } else {
+                        return {
+                            status: 1, message: "Email sent: " + info.response
+                        };
+                    }
+                });
+            } catch (e) {
+                return { status: -1, message: "error sending email" };
+            }
         }
     }

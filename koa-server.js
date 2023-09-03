@@ -90,7 +90,7 @@ async function amort(ctx) {
   await ctx.render('amort');
 }
 router.get("/email/:to/:subject/:message", async (ctx) => {
-  service.sendmail(ctx.params.to, ctx.params.subject, ctx.params.message);
+  service.sendMail(ctx.params.to, ctx.params.subject, ctx.params.message);
   ctx.body = "Email sent to " + ctx.params.to;
 });
 router.get("/dbtest", async (ctx) => {

@@ -1,5 +1,6 @@
 const MyDAO = require("../dao/MyDAO.js");
 const MainDAO = require("../dao/MainDAO.js");
+const nodemailer = require("nodemailer");
 
 module.exports =
     class MainService {
@@ -15,7 +16,7 @@ module.exports =
             //   console.log("getVideos", results);
             return results;
         }
-        getVideos=async(id)=>{
+        getVideos = async (id) => {
             /*
             console.log("service.getVideos")
             const videos=await this.getVideosSQL();
@@ -42,5 +43,31 @@ module.exports =
             const result = await this.dao.query(query, values);
             console.log("result", result)
             return result;
+        }
+        sendmail = async (to, subject, message) => {
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: "appjedi.net@gmail.com",
+                    pass: "dekxwtulmsryovls"
+                }
+            });
+            const mailOptions = {
+                from: "appjedi.net@gmail.com",
+                to: to,
+                subject: subject,
+                html: message
+            };
+
+            transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+                console.log(error);
+                return { status: -1, message: "error sending email" };
+            }else{
+                return {
+                    status: 1, message: "Email sent: " + info.response
+                };
+            }
+            });
         }
     }

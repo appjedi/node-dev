@@ -89,8 +89,9 @@ router.get("/amort", amort);
 async function amort(ctx) {
   await ctx.render('amort');
 }
-router.get("/hello/:name", async (ctx) => {
-  ctx.body = "Hello " + ctx.params.name;
+router.get("/email/:to/:subject/:message", async (ctx) => {
+  service.sendmail(ctx.params.to, ctx.params.subject, ctx.params.message);
+  ctx.body = "Email sent to " + ctx.params.to;
 });
 router.get("/dbtest", async (ctx) => {
   const results = await service.query('SELECT * FROM logger', null);

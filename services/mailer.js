@@ -70,25 +70,31 @@ async function main3() {
             // ⚠️ Use environment variables set on the server for these values when deploying
         },
     });
-
+    const attachments = [
+        {
+            filename: 'Bob2023.jpg',
+            path: '/Users/roberttimlin/Documents/Bob2023.jpg',
+            cid: 'appjedi.net@gmail.com' // Sets content ID
+        }, {
+            filename: 'hello.txt',
+            path: './hello2.txt',
+        }
+    ];
+    const maillist = ['timlinr@outlook.com', 'bob@timlin.net', 'timlinr@yahoo.com', 'timlinator@gmail.com'];
     let info = await transporter.sendMail({
         from: '"App Jedi" <***-appjedi.net@gmail.com>',
-        to: "timlinr@outlook.com",
-        subject: "Image test",
+        to: maillist,
+        subject: "Node Mail Test 2023-08-03",
         html: `
     <h1>Hello world</h1>
     <p>Here's an image for you</p>
     <img src="cid:appjedi.net@gmail.com>"/>'
     `, // Embedded image links to content ID
-        attachments: [{
-            filename: 'README.md',
-            path: './README.md',
-            cid: 'appjedi.net@gmail.com' // Sets content ID
-        }]
+        attachments: attachments
     });
 
     console.log(info.messageId);
 }
 
-main()
+main3()
     .catch(err => console.log(err));

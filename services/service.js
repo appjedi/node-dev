@@ -4,10 +4,10 @@ const nodemailer = require("nodemailer");
 
 module.exports =
     class MainService {
-        constructor(connObj) {
+        constructor(connObj, mailAuth) {
             console.log("connObj", connObj);
             this.dao = new MyDAO(connObj);
-            
+            this.mailAuth = mailAuth;
             this.mainDAO = new MainDAO();
         }
 
@@ -52,21 +52,16 @@ module.exports =
                 return {status:-1, message:"error"}
             }
         }
-        sendMail = async (to, subject, message) => {
+        sendMail = async (mailOptions) => {
             try {
+                console.log ("sendMail", mailOptions,this.mailAuth)
                 const transporter = nodemailer.createTransport({
                     service: "gmail",
                     auth: {
-                        user: "appjedi.net@gmail.com",
-                        pass: "dekxwtulmsryovls"
+                        user: this.mailAuth.user,
+                        pass: this.mailAuth.pass
                     }
                 });
-                const mailOptions = {
-                    from: "appjedi.net@gmail.com",
-                    to: to,
-                    subject: subject,
-                    html: message
-                };
 
                 transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {

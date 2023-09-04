@@ -27,9 +27,9 @@ app.use(bodyParser());
 const GC_RELEASE = "2023-07-16";
 // 
 //const dao = new MainDAO(process.env.MONGO_URL);
-const MySQL_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
-const MAIL_OPTIONS = JSON.parse(process.env.MAIL_OPTIONS_2);
-const service = new MainService(MySQL_CONNECTIONS[2], MAIL_OPTIONS);
+//const MySQL_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
+//const MAIL_OPTIONS = JSON.parse(process.env.MAIL_OPTIONS_2);
+const service = new MainService(process.env.MONGO_URL);
 
 let ssn;
 const GC_STUDENTS = [];
@@ -100,7 +100,7 @@ async function amort(ctx) {
 }
 router.get("/email/:to/:subject/:message", async (ctx) => {
   const mailOptions = {
-      from:MAIL_OPTIONS.from,
+      from:"",
       to: ctx.params.to,
       subject: ctx.params.subject,
       html: ctx.params.message
@@ -226,6 +226,7 @@ router.get("/users", async (ctx) => {
   const users = await mongoFind("users", {})
   ctx.body = users;
 });
+
 const mongoInsert = async (obj, doc = "users") => {
   const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
   const dbo = db.db(GC_MONGO_DB_NAME);
@@ -382,22 +383,3 @@ app.listen(PORT, () => {
   console.log("listening on port:", PORT);
 })
 
-let GC_CONNECTIONS_old = [{
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
-  password: ''
-},
-{
-  host: 'appdojo.net',
-  user: 'appjedin_sensei',
-  database: 'appjedin_training',
-  password: 'Sensei2022!'
-}, {
-  host: "192.168.64.2", // Mac
-  user: "training",
-  password: "Test1234",
-  database: "test",
-  port: 3306
-}
-];

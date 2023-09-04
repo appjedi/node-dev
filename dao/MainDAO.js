@@ -103,7 +103,7 @@ module.exports =
         getKeyValue = async (key) => {
             const query = key === "all"? { }: { key: key };
             const doc = await this.KeyValueData.find(query)
-            console.log("getKeyValue:", key, doc);
+          //  console.log("getKeyValue:", key, doc);
             if (key === "all") {
                 return doc;
             } else {

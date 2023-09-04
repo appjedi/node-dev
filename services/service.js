@@ -1,7 +1,6 @@
 const MyDAO = require("../dao/MyDAO.js");
 const MainDAO = require("../dao/MainDAO.js");
 const nodemailer = require("nodemailer");
-
 module.exports =
     class MainService {
         constructor(mongoLink) {
@@ -12,11 +11,22 @@ module.exports =
             this.init();
         }
         init = async () => {
-            const myConn = await this.getKeyValue("MySQL_JSON");
+            this.keyValues = await this.getKeyValue("all");
+            const myConn = await this.getKeyValueLocal("MySQL_JSON");
             console.log("myConn", myConn);
             this.dao = new MyDAO(myConn);
-            this.mailAuth = await this.getKeyValue("MAIL_OPTIONS");
+            this.mailAuth = await this.getKeyValueLocal("MAIL_OPTIONS");
             console.log("mailAuth", this.mailAuth);
+        }
+        getKeyValueLocal = (key) => {
+            for (let kv of this.keyValues)
+            {
+               // console.log("KV", KV);
+                if (kv.key === key)
+                {
+                    return kv.value;
+                }    
+            }
         }
         getKeyValue = async (key) => {
             try{

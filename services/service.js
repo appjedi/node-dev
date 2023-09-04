@@ -56,7 +56,8 @@ module.exports =
             try {
                 console.log ("sendMail", mailOptions,this.mailAuth)
                 const transporter = nodemailer.createTransport({
-                    service: "gmail",
+                    host: this.mailAuth.host,
+                    port: this.mailAuth.port,
                     auth: {
                         user: this.mailAuth.user,
                         pass: this.mailAuth.pass

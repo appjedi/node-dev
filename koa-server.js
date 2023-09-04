@@ -28,7 +28,7 @@ const GC_RELEASE = "2023-07-16";
 // 
 //const dao = new MainDAO(process.env.MONGO_URL);
 const MySQL_CONNECTIONS = JSON.parse(process.env.MySQL_JSON);
-const MAIL_OPTIONS = JSON.parse(process.env.MAIL_OPTIONS);
+const MAIL_OPTIONS = JSON.parse(process.env.MAIL_OPTIONS_2);
 const service = new MainService(MySQL_CONNECTIONS[2], MAIL_OPTIONS);
 
 let ssn;
@@ -92,7 +92,7 @@ async function amort(ctx) {
 }
 router.get("/email/:to/:subject/:message", async (ctx) => {
   const mailOptions = {
-      from: "appjedi.net@gmail.com",
+      from:MAIL_OPTIONS.from,
       to: ctx.params.to,
       subject: ctx.params.subject,
       html: ctx.params.message

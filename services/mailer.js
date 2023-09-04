@@ -61,12 +61,12 @@ async function main2() {
 async function main3() {
 
     let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
+        host: "spro3.fcomet.com",
         port: 465,
         secure: true,
         auth: {
-            user: "appjedi.net@gmail.com",
-            pass: "dekxwtulmsryovls",
+            user: "bob@timlin.net",
+            pass: "@Jedi2023",
             // ⚠️ Use environment variables set on the server for these values when deploying
         },
     });
@@ -74,26 +74,29 @@ async function main3() {
         {
             filename: 'Bob2023.jpg',
             path: '/Users/roberttimlin/Documents/Bob2023.jpg',
-            cid: 'appjedi.net@gmail.com' // Sets content ID
+            cid: 'bob@timlin.net' // Sets content ID
         }, {
             filename: 'hello.txt',
             path: './hello2.txt',
         }
     ];
-    const maillist = ['timlinr@outlook.com', 'bob@timlin.net', 'timlinr@yahoo.com', 'timlinator@gmail.com'];
+    const maillist = ['timlinr@outlook.com', 'timlinr@yahoo.com', 'timlinator@gmail.com'];
     let info = await transporter.sendMail({
-        from: '"App Jedi" <***-appjedi.net@gmail.com>',
+        from: '"Bob T" <bob@timlin.net>',
         to: maillist,
-        subject: "Node Mail Test 2023-08-03",
+        subject: "Node Mail Test 2023-08-04 B",
         html: `
-    <h1>Hello world</h1>
+    <h1>Hello world from bob@timlin.net</h1>
     <p>Here's an image for you</p>
     <img src="cid:appjedi.net@gmail.com>"/>'
     `, // Embedded image links to content ID
         attachments: attachments
     });
 
-    console.log(info.messageId);
+    console.log("messageId:", info.messageId);
+    console.log("accepted:", info.accepted);
+    console.log("rejected:", info.rejected);
+
 }
 
 main3()

@@ -1,6 +1,6 @@
 const MyDAO = require("../dao/MyDAO.js");
 const MainDAO = require("../dao/MainDAO.js");
-const nodemailer = require("nodemailer");
+const nodeMailer = require("nodemailer");
 module.exports =
     class MainService {
         constructor(mongoLink) {
@@ -21,7 +21,6 @@ module.exports =
         getKeyValueLocal = (key) => {
             for (let kv of this.keyValues)
             {
-               // console.log("KV", KV);
                 if (kv.key === key)
                 {
                     return kv.value;
@@ -79,7 +78,7 @@ module.exports =
         }
         sendMail = async (mailOptions) => {
             try {
-                const transporter = nodemailer.createTransport({
+                const transporter = nodeMailer.createTransport({
                     host: this.mailAuth.host,
                     port: this.mailAuth.port,
                     auth: {

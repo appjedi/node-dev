@@ -6,6 +6,7 @@ module.exports =
     class MainDAO {
         constructor(url) {
             this.url = this.getConnURL();
+
             this.init(this.url);
         }
         init = async (url) => {
@@ -75,7 +76,7 @@ module.exports =
 
             this.keyValueSchema = new Schema({
                 key: String,
-                value: String
+                value: Object
             }, { collection: 'key_values' });
             this.KeyValueData = mongoose.model('KeyValueData', this.keyValueSchema);
         }
@@ -100,8 +101,14 @@ module.exports =
             }
         };
         getKeyValue = async (key) => {
-            const doc = await this.KeyValueData.find({ key: key })
-            return doc[0].value;
+            const query = key === "all"? { }: { key: key };
+            const doc = await this.KeyValueData.find(query)
+            console.log("getKeyValue:", key, doc);
+            if (key === "all") {
+                return doc;
+            } else {
+                return doc[0].value;
+            }
         }
         getConnURL() {
             console.log("getConnURL.process.env.MONGO_URL", process.env.MONGO_URL);

@@ -86,6 +86,14 @@ router.get("/stripe", async (ctx) => {
 router.get("/release", async (ctx) => {
   ctx.body = GC_RELEASE;
 });
+router.get("/key-value/:key", async (ctx) => {
+  const key = ctx.params.key;
+  console.log("KEY:", key)
+  const val = await service.getKeyValue(key);
+  console.log("VALUE:",val);
+  //ctx.body = videos;
+  ctx.body = val;
+});
 router.get("/amort", amort);
 async function amort(ctx) {
   await ctx.render('amort');
@@ -97,9 +105,9 @@ router.get("/email/:to/:subject/:message", async (ctx) => {
       subject: ctx.params.subject,
       html: ctx.params.message
   };
-  service.sendMail(mailOptions);
+  const resp=await service.sendMail(mailOptions);
   //service.sendMail(ctx.params.to, ctx.params.subject, ctx.params.message);
-  ctx.body = "Email sent to " + ctx.params.to;
+  ctx.body = resp;
 });
 router.get("/dbtest", async (ctx) => {
   const results = await service.query('SELECT * FROM logger', null);

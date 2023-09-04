@@ -4,13 +4,28 @@ const nodemailer = require("nodemailer");
 
 module.exports =
     class MainService {
-        constructor(connObj, mailAuth) {
-            console.log("connObj", connObj);
-            this.dao = new MyDAO(connObj);
-            this.mailAuth = mailAuth;
-            this.mainDAO = new MainDAO();
+        constructor(mongoLink) {
+            //this.dao = new MyDAO(connObj);
+            //this.mailAuth = mailAuth;
+            console.log("mongoLink:", mongoLink);
+            this.mainDAO = new MainDAO(mongoLink);
+            this.init();
         }
-
+        init = async () => {
+            const myConn = await this.getKeyValue("MySQL_JSON");
+            console.log("myConn", myConn);
+            this.dao = new MyDAO(myConn);
+            this.mailAuth = await this.getKeyValue("MAIL_OPTIONS");
+            console.log("mailAuth", this.mailAuth);
+        }
+        getKeyValue = async (key) => {
+            try{
+                const val = await this.mainDAO.getKeyValue(key);
+                return val;
+            } catch (e) {
+                return {status:-1, message:"error"}
+            }
+        }
         getVideosSQL = async () => {
             try{
             const results = await this.dao.query("SELECT * FROM view_videos ");
@@ -54,7 +69,6 @@ module.exports =
         }
         sendMail = async (mailOptions) => {
             try {
-                console.log ("sendMail", mailOptions,this.mailAuth)
                 const transporter = nodemailer.createTransport({
                     host: this.mailAuth.host,
                     port: this.mailAuth.port,
@@ -63,17 +77,18 @@ module.exports =
                         pass: this.mailAuth.pass
                     }
                 });
+                mailOptions.from = this.mailAuth.from;
+                console.log ("sendMail:", mailOptions,this.mailAuth)
 
-                transporter.sendMail(mailOptions, function (error, info) {
-                    if (error) {
-                        console.log(error);
-                        return { status: -1, message: "error sending email" };
-                    } else {
-                        return {
-                            status: 1, message: "Email sent: " + info.response
-                        };
-                    }
-                });
+                const info = await transporter.sendMail(mailOptions);
+                const resp =
+                {
+                    status: 1, message: "Email sent successfully.",
+                    messageId: info.messageId, accepted: info.accepted, rejected: info.rejected
+                };
+                console.log("sendMail.response:", resp);
+                return resp;
+                
             } catch (e) {
                 return { status: -1, message: "error sending email" };
             }

@@ -19,37 +19,35 @@ module.exports =
             console.log("mailAuth", this.mailAuth);
         }
         getKeyValueLocal = (key) => {
-            for (let kv of this.keyValues)
-            {
-                if (kv.key === key)
-                {
+            for (let kv of this.keyValues) {
+                if (kv.key === key) {
                     return kv.value;
-                }    
+                }
             }
         }
         getKeyValue = async (key) => {
-            try{
+            try {
                 const val = await this.mainDAO.getKeyValue(key);
                 return val;
             } catch (e) {
-                return {status:-1, message:"error"}
+                return { status: -1, message: "error" }
             }
         }
-        getVideosSQL = async () => {
-            try{
-            const results = await this.dao.query("SELECT * FROM view_videos ");
-            //   console.log("getVideos", results);
+        getVideos = async () => {
+            try {
+                const results = await this.dao.query("SELECT * FROM view_videos ");
+                //   console.log("getVideos", results);
                 return results;
             } catch (e) {
-                return {status:-1, message:"error"}
-            } 
+                return { status: -1, message: "error" }
+            }
         }
-        getVideos = async (id) => {
-            try{
+        getVideosFromMongo = async (id) => {
+            try {
                 const videos = await this.mainDAO.getVideos(id);
                 return videos;
             } catch (e) {
-                return {status:-1, message:"error"}
+                return { status: -1, message: "error" }
             }
         }
         saveVideo = async (data) => {
@@ -64,16 +62,16 @@ module.exports =
                 console.log("result", result);
                 return result;
             } catch (e) {
-                return {status:-1, message:"error"}
+                return { status: -1, message: "error" }
             }
         }
         query = async (query, values) => {
-            try{
+            try {
                 const result = await this.dao.query(query, values);
                 console.log("result", result)
                 return result;
             } catch (e) {
-                return {status:-1, message:"error"}
+                return { status: -1, message: "error" }
             }
         }
         sendMail = async (mailOptions) => {
@@ -87,7 +85,7 @@ module.exports =
                     }
                 });
                 mailOptions.from = this.mailAuth.from;
-                console.log ("sendMail:", mailOptions,this.mailAuth)
+                console.log("sendMail:", mailOptions, this.mailAuth)
 
                 const info = await transporter.sendMail(mailOptions);
                 const resp =
@@ -97,7 +95,7 @@ module.exports =
                 };
                 console.log("sendMail.response:", resp);
                 return resp;
-                
+
             } catch (e) {
                 return { status: -1, message: "error sending email" };
             }

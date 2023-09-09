@@ -90,7 +90,7 @@ router.get("/key-value/:key", async (ctx) => {
   const key = ctx.params.key;
   console.log("KEY:", key)
   const val = await service.getKeyValue(key);
-  console.log("VALUE:",val);
+  console.log("VALUE:", val);
   //ctx.body = videos;
   ctx.body = val;
 });
@@ -100,12 +100,12 @@ async function amort(ctx) {
 }
 router.get("/email/:to/:subject/:message", async (ctx) => {
   const mailOptions = {
-      from:"",
-      to: ctx.params.to,
-      subject: ctx.params.subject,
-      html: ctx.params.message
+    from: "",
+    to: ctx.params.to,
+    subject: ctx.params.subject,
+    html: ctx.params.message
   };
-  const resp=await service.sendMail(mailOptions);
+  const resp = await service.sendMail(mailOptions);
   //service.sendMail(ctx.params.to, ctx.params.subject, ctx.params.message);
   ctx.body = resp;
 });

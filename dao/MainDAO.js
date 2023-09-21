@@ -138,32 +138,33 @@ module.exports =
             }
         }
         postAttendance = async (list) => {
-           // console.log("MainDAO.postAttendance:", list);
-            /*
-              const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-              const dbo = db.db(GC_MONGO_DB_NAME);
-              const doc = await dbo.collection("students");
-           */
-            //const doc = await getDocument("students");
-            for (let row of list) {
-                console.log("ROW:", row);
-                let s = await this.getStudents(row.id);
-                if (s) {
-                    s = s[0];
-                    console.log("STUDENT:", s)
-                    const posted = new Date();
-                    const rec = { classDate: row.classDate, dojoId: row.dojoId, posted: posted }
-                    if (!s["attendance"]) {
-                        console.log("NO ATTENDANCE");
-                        s["attendance"] = [];
-                    }
-                    //console.log("POSTING: ", s.attendance);
-                    const id = s.id;
-                    s.attendance.push(rec);
-                    console.log("POSTING: ", s.attendance);
+            try {
+                for (let row of list) {
+                    console.log("ROW:", row);
+                    let s = await this.getStudents(row.id);
+                    if (s) {
+                        s = s[0];
+                        console.log("STUDENT:", s)
+                        const posted = new Date();
+                        const rec = { classDate: row.classDate, dojoId: row.dojoId, posted: posted }
+                        if (!s["attendance"]) {
+                            console.log("NO ATTENDANCE");
+                            s["attendance"] = [];
+                        }
+                        //console.log("POSTING: ", s.attendance);
+                        const id = s.id;
+                        s.attendance.push(rec);
+                        console.log("POSTING: ", s.attendance);
 
-                    await this.StudentData.findOneAndUpdate({ id: id }, { attendance: s.attendance });
+                        await this.StudentData.findOneAndUpdate({ id: id }, { attendance: s.attendance });
+                    }
                 }
+                const msg =rows.length+" rows updated";
+                return {status:1, message:msg}
+
+            } catch (e) {
+                console.log("MainDAO.postAttendance ex", e);
+                return { status: -1, message: "postAttendance error" };
             }
         }
         updateStudent = async (student) => {

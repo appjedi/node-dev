@@ -81,14 +81,9 @@ module.exports =
             }
         };
         postAttendance = async (list) => {
-            /*
-                const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-                const dbo = db.db(GC_MONGO_DB_NAME);
-                const doc = await dbo.collection("students");
-            */
-            this.mainDAO.postAttendance(list);
+            const msg = await this.mainDAO.postAttendance(list);
 
-            return { status: 1, message: "updated " + list.length };
+            return msg
         }
         createStudent = async (student) => {
             return this.mainDAO.createStudent(student);

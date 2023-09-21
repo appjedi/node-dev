@@ -49,7 +49,7 @@ router.get("/", async (ctx) => {
     ctx.redirect("/login?msg=Please login");
     return;
   }
-  const s = await dao.getStudents(0);
+  const s = await service.getStudents(0);
   // console.log(s);
   s.sort((a, b) => {
     const diff = b.rank - a.rank;
@@ -90,6 +90,7 @@ router.get("/students", async (ctx) => {
     return;
   }
   const s = await service.getStudents(0);
+ // console.log("STUDENTS:", s);
   s.sort((a, b) => {
     const diff = b.rank - a.rank;
     if (diff !== 0)
@@ -113,14 +114,14 @@ router.get("/student/:id", async (ctx) => {
 router.post("/student", async (ctx) => {
   const s = ctx.request.body;
   console.log("POST STUDENT:",s);
-  const resp = await mongoInsert(s,"students");
+  const resp = await 
   console.log("RESP", resp);
   ctx.body = resp
 });
 router.post("/attendance", async (ctx) => {
   const s = ctx.request.body;
   console.log("attendance:", s);
-  const resp = await service.postAttendance(s);
+  const resp = await service.updateStudent(s);
  //const resp = { status: 1, message: "done" };
   console.log("RESP", resp);
   ctx.body = resp
@@ -128,7 +129,7 @@ router.post("/attendance", async (ctx) => {
 router.put("/student", async (ctx) => {
   const s = ctx.request.body;
   console.log("PUT", s);
-  const resp = await mongoUpate(s, "students");
+  const resp = await service.updateStudent(s);
   ctx.body = resp
 });
 router.get("/stripe", async (ctx) => {
@@ -206,10 +207,10 @@ router.post('/login', async (ctx) => {
   const password = ctx.request.body.password;
   console.log("/login:", username);
 
-  const auth = await loginMongo(username, password);
+  const auth = await service.login(username, password);
   //const auth = await dao.dbAuth(username, password);
   console.log("Authenticated!", auth);
-  if (auth && auth.userId > 0) {
+  if (auth && auth.status > 0) {
     console.log("Authenticated!", auth);
     const obj = { auth: true, userId: auth.id, userName: auth.username, roleId: auth.role_id };
     console.log("AUTH:", obj);
@@ -217,7 +218,7 @@ router.post('/login', async (ctx) => {
 
     //this.session.user = auth;
     ssn.user = auth;
-    // console.log("SESSION", ssn);
+    console.log("SESSION", ssn);
     ctx.redirect("/");
   } else {
     // ctx.body={auth:false};

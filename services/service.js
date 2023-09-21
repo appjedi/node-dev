@@ -68,7 +68,7 @@ module.exports =
         getStudents = async (id) => {
             try {
                
-                const rows = await this.dao.getStudents(id);
+                const rows = await this.mainDAO.getStudents(id);
             //  console.log(id, "ROWS:", rows);
                 if (rows)
                     return id === 0 ? rows : rows[0];
@@ -86,9 +86,12 @@ module.exports =
                 const dbo = db.db(GC_MONGO_DB_NAME);
                 const doc = await dbo.collection("students");
             */
-            this.dao.postAttendance(list);
+            this.mainDAO.postAttendance(list);
 
             return { status: 1, message: "updated " + list.length };
+        }
+        updateStudent = async (student) => {
+            return this.mainDAO.updateStudent(student);
         }
         query = async (query, values) => {
             try {
@@ -107,6 +110,16 @@ module.exports =
                 return resp;
             }catch (e) {
                 return { status: -1, message: "error" }
+            }
+        }
+        login = async (user, pass) => {
+            try {
+                console.log("service.login:", user);
+                const resp = await this.mainDAO.dbAuth(user, pass);
+                return resp;
+            } catch (e) {
+                console.log("login error:", e);
+                return { status: -1, message: "error loggin in" }
             }
         }
         sendMail = async (mailOptions) => {

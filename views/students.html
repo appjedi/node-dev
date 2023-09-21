@@ -34,6 +34,7 @@
       }
       let GV_CURRENT_STUDENT_IDX;
       function edit(idx) {
+        console.log ("edit:",students[idx]);
         //alert(students[idx].name);
         GV_CURRENT_STUDENT_IDX=idx;
         $("#fullName").val(students[idx].name);

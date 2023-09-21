@@ -1,0 +1,71 @@
+mongoLink: mongodb+srv://appuser:AppData2022@cluster0.aga82.mongodb.net/wkk
+MONGO URL mongodb+srv://appuser:AppData2022@cluster0.aga82.mongodb.net/wkk
+MainDAO.init.process.env.MONGO_URL mongodb+srv://appuser:AppData2022@cluster0.aga82.mongodb.net/wkk
+listening on port: 3000
+myConn {
+  host: 'appdojo.net',
+  user: 'appjedin_dba',
+  database: 'appjedin_wkk_prod',
+  password: '$Data2022'
+}
+mailAuth {
+  from: 'App Jedi <appjedi.net@gmail.com>',
+  user: 'appjedi.net@gmail.com',
+  pass: 'dekxwtulmsryovls',
+  port: '465',
+  host: 'smtp.gmail.com'
+}
+Executing (default): SELECT 1+1 AS result
+database connected
+attendance: [
+  {
+    id: '646f6638fd92c1a0d136aa52',
+    name: 'Robert Timlin',
+    classDate: 20230921,
+    dojoId: 1,
+    posted: '2023-09-21T14:52:34.868Z'
+  }
+]
+MainDAO.postAttendance: [
+  {
+    id: '646f6638fd92c1a0d136aa52',
+    name: 'Robert Timlin',
+    classDate: 20230921,
+    dojoId: 1,
+    posted: '2023-09-21T14:52:34.868Z'
+  }
+]
+ROW: {
+  id: '646f6638fd92c1a0d136aa52',
+  name: 'Robert Timlin',
+  classDate: 20230921,
+  dojoId: 1,
+  posted: '2023-09-21T14:52:34.868Z'
+}
+getStudents v2: { _id: '646f6638fd92c1a0d136aa52' }
+RESP { status: 1, message: 'updated 1' }
+STUDENT: [
+  {
+    _id: new ObjectId("646f6638fd92c1a0d136aa52"),
+    id: 1,
+    name: 'Robert Timlin',
+    parentGuardian: 'self',
+    phoneNumber: '415 305 2646',
+    email: 'sensei.bob@wadokikai.org',
+    rank: 12,
+    startDate: '1992-11-23',
+    attended: 0,
+    status: 1,
+    age: 56,
+    attendance: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  }
+]
+POSTING:  { classDate: 20230921, dojoId: 1, posted: 2023-09-21T14:52:34.969Z }

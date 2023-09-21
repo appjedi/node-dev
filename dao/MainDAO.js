@@ -126,25 +126,42 @@ module.exports =
             console.log("updateFromStripe.ID:", id);
             return "updated";
         }
+        createStudent = async (student) => {
+            try {
+                console.log("ManDAO.updateStudent pre:", student);
+                const id = student.id;
+                await this.StudentData.create(student);
+                return {status:1, message:"updateStudent done"}
+            } catch (e) {
+                console.log("ManDAO.updateStudent ex", e);
+                return { status: -1, message: "createStudent failed" };
+            }
+        }
         postAttendance = async (list) => {
+           // console.log("MainDAO.postAttendance:", list);
             /*
               const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
               const dbo = db.db(GC_MONGO_DB_NAME);
               const doc = await dbo.collection("students");
            */
-            const doc = await getDocument("students");
-            for (row of list) {
+            //const doc = await getDocument("students");
+            for (let row of list) {
                 console.log("ROW:", row);
-                const s = await getStudents(row.id);
+                let s = await this.getStudents(row.id);
                 if (s) {
+                    s = s[0];
                     console.log("STUDENT:", s)
                     const posted = new Date();
                     const rec = { classDate: row.classDate, dojoId: row.dojoId, posted: posted }
                     if (!s["attendance"]) {
+                        console.log("NO ATTENDANCE");
                         s["attendance"] = [];
                     }
-                    console.log("POSTING: ", rec);
+                    //console.log("POSTING: ", s.attendance);
+                    const id = s.id;
                     s.attendance.push(rec);
+                    console.log("POSTING: ", s.attendance);
+
                     await this.StudentData.findOneAndUpdate({ id: id }, { attendance: s.attendance });
                 }
             }
@@ -162,10 +179,11 @@ module.exports =
                     startDate: student.startDate,
                     status: student.status
                 }
-                await this.StudentData.findOneAndUpdate({ id: id }, { status: status, paid: paid });
+                await this.StudentData.findByIdAndUpdate(id, { startDate: student.startDate,status: student.status, paid: student.paid });
+                return { status: 1, message: "updated" };
             } catch (e) {
                 console.log(e);
-                return { status: -1 };
+                return { status: -1, message:"error updating student" };
             }
         }
         updateVideo =async (v)=>{
@@ -297,16 +315,22 @@ module.exports =
             }
         }
         dbAuth = async (username, password) => {
-            const data = await this.UserData.find({ username: username });
-            if (!data) {
-                return { status: -1, message: "Not Found", userId: -1 }
+            try {
+                console.log("dbAuth:", username);
+                const data = await this.UserData.find({ username: username });
+                console.log("dbAuth", data);
+                if (!data) {
+                    return { status: -1, message: "Not Found", userId: -1 }
+                }
+                if (data[0].password !== password) {
+                    return { status: -2, message: "Invalid password", userId: -1 }
+                }
+                const user = { name: data[0].username, status: 1, message: "Authenticated", userId: data[0].id };
+                return user;
+            } catch (e) {
+                console.log("dbauth ex:", e);
+                return { status: -2, message: "Error logging in", userId: -1 }
             }
-            if (data[0].password !== password) {
-                return { status: -2, message: "Invalid password", userId: -1 }
-            }
-            const user = { name: data[0].username, status: 1, message: "Authenticated", userId: data[0].id };
-            return user;
-
         }
     }
 // export {dbAuth, updateUser, getUsers,  addDonation, getUserByEmail, getDonations, updateFromStripe };ß

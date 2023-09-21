@@ -107,7 +107,7 @@ module.exports =
                 console.log(e);
                 return null;
             }
-        };
+        }
         getKeyValue = async (key) => {
             const query = key === "all"? { }: { key: key };
             const doc = await this.KeyValueData.find(query)
@@ -118,14 +118,13 @@ module.exports =
                 return doc[0].value;
             }
         }
-        
         updateFromStripe = async (id, status) => {
             const paid = new Date().getTime()
             await this.DonationData.findOneAndUpdate({ id: id }, { status: status, paid: paid });
 
             console.log("updateFromStripe.ID:", id);
             return "updated";
-        }
+        };
         createStudent = async (student) => {
             try {
                 console.log("ManDAO.updateStudent pre:", student);

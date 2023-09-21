@@ -30,6 +30,8 @@
           videoDate.value=GV_VIDEO_OBJ.video_date;
           status.value=GV_VIDEO_OBJ.status;
           sortOrder.value=GV_VIDEO_OBJ.sortOrder;
+          $("#form1").show();
+
       }
       async function save()
       {
@@ -57,29 +59,36 @@
           const json = await resp.json();
           console.log(json);
           alert(json[0].message);
+          $("#form1").hide();
+
+      }
+      function cancel ()
+      {
+          $("#form1").hide();
       }
       function pageLoad(){
+        $("#form1").hide();
         displayVideos();
       }
       function displayVideos()
       {
-        console.log("VIDEOS", videos);
+       // console.log("VIDEOS", videos);
         let content="";
         let idx=0;
         for (let row of videos)
         {
-          console.log(row);
+          //console.log(row);
             const tr = `<tr><td><a href='javascript:editVideo(${idx})'>${row.title}</a></td></tr>`;
             content+=tr;
             ++idx;
         }
-        console.log ("content",content)
+        //console.log ("content",content)
         tboydId.innerHTML=content;
       }
     </script>
   </head>
   <body onload="pageLoad()">
-    <h2>New Student:</h2>
+    <h2>Videos:</h2>
     <div id="form1">
       <p>
         <input
@@ -116,7 +125,10 @@
         Order By:<br />
         <input type="number" id="sortOrder" size="5" />
       </p>
-      <p><button id="btnSave" onClick="save()">Add</button></p>
+      <p>
+        <button id="btnSave" onClick="save()">Save</button>
+        <button id="btnCancel" onClick="cancel()">Cancel</button>
+      </p>
     </div>
     <div id="divTable">
       <table>

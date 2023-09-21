@@ -8,11 +8,9 @@ const render = require('koa-ejs');
 const bodyParser = require('koa-bodyparser');
 const path = require('path');
 const session = require('koa-session');
-const MainDAO = require("./dao/MainDAO.js");
 //const stripe = require('./services/stripe.mjs');
 const MainService = require('./services/service.js')
 const mongodb = require('mongodb');
-const MongoClient = require('mongodb').MongoClient;
 //import serve from "koa-static"; // CJS: require('koa-static')
 
 // 
@@ -80,6 +78,59 @@ router.post("/video", async (ctx) => {
   //ctx.body = videos;
   ctx.body = result;
 });
+router.get("/api/students", async (ctx) => {
+    const students = await service.getStudents(0);
+    ctx.body=students;
+});
+router.get("/students", async (ctx) => {
+  ssn = ctx.session;
+  if (!ssn || !ssn['user'])
+  {
+    ctx.redirect("/login?msg=Please login");
+    return;
+  }
+  const s = await service.getStudents(0);
+  s.sort((a, b) => {
+    const diff = b.rank - a.rank;
+    if (diff !== 0)
+    {
+      return diff;
+    }
+    return b.name > a.name ? -1 : 1;
+  })
+ // console.log("STUDENTS:", s);
+  await ctx.render('students',
+    { students: s, levels: GC_LEVELS }
+  );
+});
+router.get("/student/:id", async (ctx) => {
+  const id = ctx.request.params.id;
+  console.log("get student by id", id);
+  const student = await service.getStudent(id);
+  console.log("STUDENT:", student);
+    ctx.body=student;
+});
+router.post("/student", async (ctx) => {
+  const s = ctx.request.body;
+  console.log("POST STUDENT:",s);
+  const resp = await mongoInsert(s,"students");
+  console.log("RESP", resp);
+  ctx.body = resp
+});
+router.post("/attendance", async (ctx) => {
+  const s = ctx.request.body;
+  console.log("attendance:", s);
+  const resp = await service.postAttendance(s);
+ //const resp = { status: 1, message: "done" };
+  console.log("RESP", resp);
+  ctx.body = resp
+});
+router.put("/student", async (ctx) => {
+  const s = ctx.request.body;
+  console.log("PUT", s);
+  const resp = await mongoUpate(s, "students");
+  ctx.body = resp
+});
 router.get("/stripe", async (ctx) => {
   await ctx.render('stripe');
 });
@@ -107,6 +158,10 @@ router.get("/email/:to/:subject/:message", async (ctx) => {
   };
   const resp = await service.sendMail(mailOptions);
   //service.sendMail(ctx.params.to, ctx.params.subject, ctx.params.message);
+  ctx.body = resp;
+});
+router.get("/logger/:msg/:src/", async (ctx) => {
+  const resp = await service.logger(ctx.params.msg, ctx.params.src);
   ctx.body = resp;
 });
 router.get("/dbtest", async (ctx) => {
@@ -200,14 +255,7 @@ router.post("/student", async (ctx) => {
   console.log("RESP", resp);
   ctx.body = resp
 });
-router.post("/attendance", async (ctx) => {
-  const s = ctx.request.body;
-  console.log("attendance:", s);
-  const resp = await postAttendance(s);
-  //const resp = { status: 1, message: "done" };
-  console.log("RESP", resp);
-  ctx.body = resp
-});
+
 router.put("/student", async (ctx) => {
   const s = ctx.request.body;
   console.log("PUT", s);
@@ -227,157 +275,6 @@ router.get("/users", async (ctx) => {
   ctx.body = users;
 });
 
-const mongoInsert = async (obj, doc = "users") => {
-  const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-  const dbo = db.db(GC_MONGO_DB_NAME);
-
-  console.log("mongoInsert:", obj);
-  const resp = await dbo.collection(doc).insertOne(obj);
-  console.log("INSERTED");
-  db.close();
-  // 
-  return resp;
-}
-const mongoInsertMany = async (list, doc) => {
-  console.log("mongoInsertMany", list);
-  const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-  var dbo = db.db(GC_MONGO_DB_NAME);
-  // await dbo.collection(doc).deleteMany();
-  // console.log("delete many");
-  await dbo.collection(doc).insertMany(list);
-  db.close();
-  console.log("insert many");
-
-}
-const mongoUpate = async (obj, doc) => {
-  const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-  const dbo = db.db("wkk");
-  const resp = await dbo.collection(doc).updateOne({ '_id': new ObjectId(obj.id) },
-    {
-      $set: {
-        'email': obj.email, phoneNumber: obj.phoneNumber, name: obj.name, rank: obj.rank, startDate: obj.startDate,
-        status: obj.status, parentGuardian: obj.parentGuardian, age: obj.age
-      }
-    });
-  db.close();
-  return { status: 1, message: "updated" };
-}
-const postAttendance = async (list) => {
-  /*
-    const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-    const dbo = db.db(GC_MONGO_DB_NAME);
-    const doc = await dbo.collection("students");
- */
-  const doc = await getDocument("students");
-  for (row of list) {
-    console.log("ROW:", row);
-    const s = await getStudent(row.id);
-    if (s) {
-      console.log("STUDENT:", s)
-      const posted = new Date();
-      const rec = { classDate: row.classDate, dojoId: row.dojoId, posted: posted }
-      if (!s["attendance"]) {
-        s["attendance"] = [];
-      }
-      console.log("POSTING: ", rec);
-      s.attendance.push(rec);
-      doc.updateOne({ '_id': new ObjectId(row.id) }, {
-        $set: { "attendance": s.attendance }
-      });
-    }
-  }
-  const resp = await mongoInsertMany(list, "attendance");
-
-  return { status: 1, message: "updated " + list.length };
-}
-const getStudent = async (id) => {
-  try {
-    const query = id === 0 ? {} : { _id: new ObjectId(id) };
-    console.log("GC_MONGO_URL", GC_MONGO_URL);
-    const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-    var dbo = db.db(GC_MONGO_DB_NAME);
-    const row = await dbo.collection("students").find(query).toArray();
-    //  console.log(id, "ROWS:", rows);
-    db.close();
-    if (row)
-      return row[0];
-    else
-      return null;
-
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
-};
-const getStudents = async (id) => {
-  try {
-    const query = id === 0 ? {} : { _id: id };
-    const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-    var dbo = db.db(GC_MONGO_DB_NAME);
-    const rows = await dbo.collection("students").find(query).toArray();
-    //  console.log(id, "ROWS:", rows);
-    db.close();
-    console.log("conn closed");
-    if (rows)
-      return id === 0 ? rows : rows[0];
-    else
-      return null;
-
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
-};
-const mongoFind = async (docName, query) => {
-  try {
-    // const query = id === 0 ? {} : { _id: id };
-    const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-    var dbo = db.db(GC_MONGO_DB_NAME);
-    const doc = dbo.collection(docName);
-
-    const rows = await doc.find(query).toArray();
-    db.close();
-    //  console.log(id, "ROWS:", rows);
-    if (rows)
-      return rows;
-    else
-      return null;
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
-};
-const getDocument = async (docName) => {
-  try {
-    // const query = id === 0 ? {} : { _id: id };
-    const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-    var dbo = db.db(GC_MONGO_DB_NAME);
-    const doc = dbo.collection(docName);
-    db.close();
-    return doc;
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
-};
-const loginMongo = async (un, pw) => {
-  try {
-    const query = { username: un }
-    const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
-    var dbo = db.db(GC_MONGO_DB_NAME);
-    const rows = await dbo.collection("users").find(query).toArray();
-    console.log("ROWS:", rows);
-    db.close();
-    if (rows.length > 0 && rows[0].password === pw) {
-      return rows[0];
-    }
-    else
-      return { id: -1, username: un, password: "invalid" };
-  } catch (e) {
-    console.log(e);
-    return { id: -2, username: un, password: "not found" };;
-  }
-};
 
 app.listen(PORT, () => {
   console.log("listening on port:", PORT);

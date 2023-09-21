@@ -65,12 +65,47 @@ module.exports =
                 return { status: -1, message: "error" }
             }
         }
+        getStudents = async (id) => {
+            try {
+               
+                const rows = await this.dao.getStudents(id);
+            //  console.log(id, "ROWS:", rows);
+                if (rows)
+                    return id === 0 ? rows : rows[0];
+                else
+                    return null;
+
+            } catch (e) {
+                console.log(e);
+                return null;
+            }
+        };
+        postAttendance = async (list) => {
+            /*
+                const db = await MongoClient.connect(GC_MONGO_URL, { useUnifiedTopology: true });
+                const dbo = db.db(GC_MONGO_DB_NAME);
+                const doc = await dbo.collection("students");
+            */
+            this.dao.postAttendance(list);
+
+            return { status: 1, message: "updated " + list.length };
+        }
         query = async (query, values) => {
             try {
                 const result = await this.dao.query(query, values);
                 console.log("result", result)
                 return result;
             } catch (e) {
+                return { status: -1, message: "error" }
+            }
+        }
+        logger = async (msg, src) => {
+            try {
+                const sp = "ups_logger(?,?)";
+                const values = [msg, src];
+                const resp = await this.query(sp, values);
+                return resp;
+            }catch (e) {
                 return { status: -1, message: "error" }
             }
         }

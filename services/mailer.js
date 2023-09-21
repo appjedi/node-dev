@@ -86,7 +86,7 @@ async function main3() {
         to: maillist,
         subject: "Node Mail Test 2023-08-04 B",
         html: `
-    <h1>Hello world from bob@timlin.net</h1>
+    <h1>Hello world from bob@timlin.snet</h1>
     <p>Here's an image for you</p>
     <img src="cid:appjedi.net@gmail.com>"/>'
     `, // Embedded image links to content ID

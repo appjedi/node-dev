@@ -5,7 +5,10 @@ const MongoClient = require('mongodb').MongoClient;
 module.exports =
     class MainDAO {
         constructor(url) {
-            this.url = this.getConnURL();
+            if (url)
+                this.url = url;
+            else
+                this.url = this.getConnURL();
 
             this.init(this.url);
         }
@@ -80,6 +83,11 @@ module.exports =
             }, { collection: 'key_values' });
             this.KeyValueData = mongoose.model('KeyValueData', this.keyValueSchema);
         }
+        getConnURL() {
+            console.log("getConnURL.process.env.MONGO_URL", process.env.MONGO_URL);
+            return process.env.MONGO_URL || "mongodb+srv://appuser:AppData2022@cluster0.aga82.mongodb.net/FauziaA"
+            //return process.env.MONGO_URL || "mongodb://localhost:27017/FauziaA";
+        }
         getStudents_v1 = async (id) => {
             try {
                 const query = id === 0 ? {} : { _id: id };
@@ -110,11 +118,7 @@ module.exports =
                 return doc[0].value;
             }
         }
-        getConnURL() {
-            console.log("getConnURL.process.env.MONGO_URL", process.env.MONGO_URL);
-            return process.env.MONGO_URL || "mongodb+srv://appuser:AppData2022@cluster0.aga82.mongodb.net/FauziaA"
-            //return process.env.MONGO_URL || "mongodb://localhost:27017/FauziaA";
-        }
+        
         updateFromStripe = async (id, status) => {
             const paid = new Date().getTime()
             await this.DonationData.findOneAndUpdate({ id: id }, { status: status, paid: paid });

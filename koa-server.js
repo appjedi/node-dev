@@ -114,7 +114,7 @@ router.get("/student/:id", async (ctx) => {
 router.post("/student", async (ctx) => {
   const s = ctx.request.body;
   console.log("POST STUDENT:",s);
-  const resp = await 
+  const resp = await service.createStudent(s)
   console.log("RESP", resp);
   ctx.body = resp
 });

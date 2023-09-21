@@ -90,6 +90,9 @@ module.exports =
 
             return { status: 1, message: "updated " + list.length };
         }
+        createStudent = async (student) => {
+            return this.mainDAO.createStudent(student);
+        }
         updateStudent = async (student) => {
             return this.mainDAO.updateStudent(student);
         }

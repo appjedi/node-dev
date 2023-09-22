@@ -67,7 +67,6 @@ module.exports =
         }
         getStudents = async (id) => {
             try {
-               
                 const rows = await this.mainDAO.getStudents(id);
             //  console.log(id, "ROWS:", rows);
                 if (rows)

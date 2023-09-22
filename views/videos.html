@@ -96,7 +96,8 @@
             hostedBy:1,
             sectionId:1,
             eventId:1,
-            status:status.value
+            status:status.value,
+            reorder:0
           }
           console.log ("SAVE DATA:", data);
           const resp = await fetch (GC_URL+"video",
@@ -170,6 +171,7 @@
         <select id="status" name="status">
           <option value="1">Current</option>
           <option value="2">Not Current</option>
+          <option value="9">DELETE</option>
         </select>
       </p>
       <p>

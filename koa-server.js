@@ -239,7 +239,7 @@ function login(u, p) {
   }
 }
 router.get("/students", async (ctx) => {
-  const students = await getStudents(0);
+  const students = await service.getStudents(0);
   ctx.body = students;
 });
 router.get("/student/:id", async (ctx) => {
@@ -252,7 +252,7 @@ router.get("/student/:id", async (ctx) => {
 router.post("/student", async (ctx) => {
   const s = ctx.request.body;
   console.log("POST STUDENT:", s);
-  const resp = await mongoInsert(s, "students");
+  const resp = await service.createStudent(s);
   console.log("RESP", resp);
   ctx.body = resp
 });
@@ -260,7 +260,7 @@ router.post("/student", async (ctx) => {
 router.put("/student", async (ctx) => {
   const s = ctx.request.body;
   console.log("PUT", s);
-  const resp = await mongoUpate(s, "students");
+  const resp = await service.updateStudent(s);
   ctx.body = resp
 });
 router.get("/seed", async (ctx) => {
@@ -272,7 +272,7 @@ router.get("/seed", async (ctx) => {
 router.get("/users", async (ctx) => {
   //mongoInsertMany(GC_STUDENTS);
 
-  const users = await mongoFind("users", {})
+  const users = await service.getUsers(0);
   ctx.body = users;
 });
 

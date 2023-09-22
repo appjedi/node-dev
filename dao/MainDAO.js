@@ -102,7 +102,6 @@ module.exports =
                     return id === 0 ? rows : rows[0];
                 else
                     return null;
-
             } catch (e) {
                 console.log(e);
                 return null;
@@ -303,7 +302,6 @@ module.exports =
             }
         }
         getUserByEmail = async (email) => {
-
             const data = await this.UserData.find({ email: email });
             if (data) {
                 const u = data[0];

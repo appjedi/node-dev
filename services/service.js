@@ -53,10 +53,10 @@ module.exports =
         saveVideo = async (data) => {
             try {
                 console.log("console", data);
-                //  usp_video_save (0,'test.com', '2023-08-01','TITLE','source',1,1,1,1,1,1)
-                const sp = "call usp_video_save (?,?,?,?,?,?,?,?,?,?,?)";
+                //  usp_video_save (0,'test.com', '2023-08-01','TITLE','source',1,1,1,1,1,1,1)
+                const sp = "call usp_video_save (?,?,?,?,?,?,?,?,?,?,?,?)";
                 const values = [data['id'], data['url'], data['videoDate'], data['title'], "src",
-                data['hostedBy'], data['categoryId'], data['sectionId'], data['eventId'], data['status'], data['sortOrder']];
+                data['hostedBy'], data['categoryId'], data['sectionId'], data['eventId'], data['status'], data['sortOrder'],data['reorder']];
                 console.log("values", values);
                 const result = this.dao.execute(sp, values);
                 console.log("result", result);
@@ -64,6 +64,11 @@ module.exports =
             } catch (e) {
                 return { status: -1, message: "error" }
             }
+        }
+        getUsers = async (id) => {
+            const users = await this.mainDAO.getUsers();
+            //const suers = await this.dao.query("SELECT * FROM view_users");
+            return users;
         }
         getStudents = async (id) => {
             try {

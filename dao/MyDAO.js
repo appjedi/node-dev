@@ -34,9 +34,13 @@ module.exports =
             return results;
         }
         execute = async (query, values) => {
-            const results = await sequelize.query(query, {
-                replacements: values
-            });
-            return results;
+            try {
+                const results = await sequelize.query(query, {
+                    replacements: values
+                });
+                return results;
+            } catch (e) {
+                console.log("dao.execute", e);
+            }
         }
     }

@@ -13,8 +13,49 @@
         border: solid;
         padding: 5px;
       }
-    </style>
 
+      .classEditForm {
+        position: absolute;
+        top: 80px;
+        left: 360px;
+        width: 40%;
+        z-index: 1000;
+        color: #225599;
+        background-color: #dfeeff;
+        border: solid;
+        text-align: left;
+      }
+
+      .formWrapper {
+        padding: 10px;
+      }
+
+      .row {
+        position: relative;
+        height: 30px;
+      }
+
+      .col1 {
+        position: absolute;
+        left: 5px;
+      }
+
+      .col2 {
+        position: absolute;
+        left: 150px;
+      }
+
+      .textarea {
+        position: relative;
+        height: 100px;
+      }
+
+      .classImage {
+        position: absolute;
+        top: 15px;
+        left: 480px;
+      }
+    </style>
     <script>
       const videos = <%-JSON.stringify(videos)%>;
       const GC_URL="http://localhost:3000/";
@@ -32,6 +73,16 @@
           sortOrder.value=GV_VIDEO_OBJ.sortOrder;
           $("#form1").show();
 
+      }
+      function addVideo() {
+          let GV_VIDEO_ID=0;
+          title.value="";
+          url.value="";
+          videoDate.value="";
+          status.value=0;
+          sortOrder.value=0;
+
+          $("#form1").show();
       }
       async function save()
       {
@@ -88,8 +139,8 @@
     </script>
   </head>
   <body onload="pageLoad()">
-    <h2>Videos:</h2>
-    <div id="form1">
+    <h2>Videos <a href="javascript:addVideo()">[+]</a>:</h2>
+    <div id="form1" class="classEditForm">
       <p>
         <input
           type="text"

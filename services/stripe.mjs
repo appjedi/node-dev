@@ -6,7 +6,7 @@ import MainDAO from "../dao/DAOClass.js";
 4242 4242 4242 4242
 */
 //const stripe (process.env.STRIPE_PRIVATE_KEY);
-const charge = async (dao, email, amount) => {
+const charge = async (dao, id, amount, name) => {
     try {
         //const dao = new MainDAO();
         const key = await dao.getKeyValue("PAYMENT_API_KEY");
@@ -27,11 +27,11 @@ const charge = async (dao, email, amount) => {
         const dt = new Date();
         // const id = dt.getTime();
 
-        const id = await dao.addDonation(email, amount);
+       // const id = await dao.addDonation(email, amount);
 
         const lineItems = [
             {
-                price_data: { currency: 'usd', product_data: { name: "donation" }, unit_amount: amount * 100 },
+                price_data: { currency: 'usd', product_data: { name: name }, unit_amount: amount * 100 },
                 quantity: 1
             }
         ];

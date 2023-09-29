@@ -33,6 +33,7 @@ let ssn;
 const GC_STUDENTS = [];
 const GC_LEVELS = ['None', 'White', 'Yellow', 'Orange', 'Green', 'Blue', 'Purple', 'Brown 3rd', 'Brown 2nd', 'Brown 1st', 'Shodan', 'Nidan', 'Sandan'];
 const GC_MONGO_DB_NAME = "wkk";
+const GC_SERVER_URL = "http://localhost:3000";
 // 
 render(app, {
   root: path.join(__dirname, 'views'),
@@ -110,6 +111,24 @@ router.get("/student/:id", async (ctx) => {
   const student = await service.getStudent(id);
   console.log("STUDENT:", student);
     ctx.body=student;
+});
+router.get("/products", async (ctx) => {
+
+  const products = await service.getProducts();
+  console.log("products:", products);
+  await ctx.render('products', {
+    products: products,
+    serverURL:GC_SERVER_URL
+    });
+});
+router.post("/api/checkout", async (ctx) => {
+  console.log("checkout:", ctx.request.body);
+  const resp = await service.purchase(ctx.request.body);
+});
+router.get("/api/products", async (ctx) => {
+  const products = await service.getProducts();
+  console.log("products:", products);
+  ctx.body = products;
 });
 router.post("/student", async (ctx) => {
   const s = ctx.request.body;

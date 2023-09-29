@@ -77,6 +77,19 @@ module.exports =
             }, { collection: 'donations' });
             this.DonationData = mongoose.model('DonationData', this.donationSchema);
 
+            this.purchaseSchema = new Schema({
+                id: String,
+                userId: String,
+                email: String,
+                fullName: String,
+                items: Array,
+                amount: Number,
+                status: Number,
+                paid: String,
+                posted: String
+            }, { collection: 'donations' });
+            this.PurchaseData = mongoose.model('PurchaseData', this.purchaseSchema);
+
             this.keyValueSchema = new Schema({
                 key: String,
                 value: Object
@@ -264,6 +277,42 @@ module.exports =
             } catch (e) {
                 console.log(e);
                 return -1;
+            }
+            return 1;
+        }
+        addPurchase = async (cart) => {
+            try {
+                const user = await this.getUserByEmail(cart.email);
+                console.log("addDonation.user:", email, user);
+                const userId = (user ? user.userId : "");
+                let amount = 0;
+                for (let item of cart.cart)
+                {
+                    amount += (item.price * item.qty);    
+                }
+                const id = new Date().getTime();
+                const item = {
+                    id: id,
+                    userId: userId,
+                    email: cart.email,
+                    fullName: cart.fullName,
+                    items:cart.cart,
+                    amount: amount,
+                    status: 0,
+                    posted: new Date(),
+                    paid: null
+                }
+
+                console.log("donation:", item)
+                // user.donations.push({ id: id, amount: amount, status: 0, paid: "" });
+                const resp = await this.PurchaseData.create(item);
+                console.log("addDonation.RESP:", resp);
+                const donations = await this.getDonations(cart.email);
+                await this.UserData.findOneAndUpdate({ email: cart.email }, { purchase: item });
+                return { status: 1, id: id, amount: amount, message:"added" };
+            } catch (e) {
+                console.log(e);
+                return { staus: -1, id: 0, amount: 0, message:"error" };
             }
             return 1;
         }

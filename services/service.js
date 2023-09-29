@@ -1,6 +1,13 @@
 const MyDAO = require("../dao/MyDAO.js");
 const MainDAO = require("../dao/MainDAO.js");
 const nodeMailer = require("nodemailer");
+const stripe = require("./stripe.mjs");
+const GC_PRODUCTS = [
+    { id: 1, name:"Patch",description: "Patch", price: 15 },
+    { id: 2, name:"Gi with Patch",description: "Gi with Patch", price: 30 },
+    { id: 3, name:"Promotion Fee",description: "Promotion Fee", price: 25 },
+    { id: 4, name:"Donation",description: "Donation", price: 0 },
+]
 module.exports =
     class MainService {
         constructor(mongoLink) {
@@ -17,6 +24,10 @@ module.exports =
             this.dao = new MyDAO(myConn);
             this.mailAuth = await this.getKeyValueLocal("MAIL_OPTIONS");
             console.log("mailAuth", this.mailAuth);
+            //this.stripe = new Stripe();
+        }
+        getProducts = async() => {
+            return GC_PRODUCTS;
         }
         getKeyValueLocal = (key) => {
             for (let kv of this.keyValues) {
@@ -84,6 +95,11 @@ module.exports =
                 return null;
             }
         };
+        purchase = async (cart) => {
+            const resp = await this.mainDAO.addPurchase(cart);
+            const resp2 = await stripe.charge(mainDAO, resp.id, resp.amount, "purchase");//dao, id, amount, name
+            return resp2;
+        }
         postAttendance = async (list) => {
             const msg = await this.mainDAO.postAttendance(list);
 

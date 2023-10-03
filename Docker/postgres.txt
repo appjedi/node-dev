@@ -5,5 +5,6 @@ https://www.youtube.com/watch?v=qECVC6t_2mU
 https://gist.github.com/Da9el00/ff1d36bf914dc1c6c71aa9d70ac68136
 % docker-compose up
 % docker container ls
-% docker inspect 18ef0ba8be16
+% docker inspect faf09c648208
 	find IPAdress
+		 "IPAddress": "172.18.0.3",

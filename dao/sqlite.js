@@ -1,7 +1,7 @@
 const sqlite3 = require("sqlite3").verbose();
 const filepath = "./data.db";
 const db = createDbConnection();
-//insertTest('admin','Test1234');
+//insertTest('bob','Test1234');
 listUsers();
 function createDbConnection(next) {
   const db = new sqlite3.Database(filepath, (error) => {

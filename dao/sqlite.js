@@ -1,8 +1,9 @@
-const sqlite3 = require("sqlite3").verbose();
+const sqlite3 = require("sqlite3");//.verbose();
 const filepath = "./data.db";
+const rows = [];
 const db = createDbConnection();
 //insertTest('bob','Test1234');
-listUsers();
+listUsers2();
 function createDbConnection(next) {
   const db = new sqlite3.Database(filepath, (error) => {
     if (error) {
@@ -35,15 +36,41 @@ function insertTest(un, pw)
     console.log("error:", ex);
   }
 }
-function listUsers()
+async function importUsers(next)
 {
   try {
     db.each(`SELECT * FROM users`, (error, row) => {
       if (error) {
         throw new Error(error.message);
       }
+      rows.push(row);
+      //      console.log(row);
+    });
+   } catch (ex) {
+    console.log("error:", ex);
+  } 
+}
+async function listUsers()
+{
+  try {
+    
+    const rows = db.get(`SELECT * FROM users`);
+    console.log(rows);
+   } catch (ex) {
+    console.log("error:", ex);
+  } 
+}
+function listUsers2()
+{
+  try {
+    db.each(`SELECT * FROM users`, (error, row) => {
+      if (error) {
+        throw new Error(error.message);
+      }
+      rows.push(row);
       console.log(row);
     });
+    
    } catch (ex) {
     console.log("error:", ex);
   } 

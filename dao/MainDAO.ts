@@ -437,7 +437,7 @@ class MainDAO {
       };
     }
   };
-  dbAuth = async (username, password) => {
+  dbAuth = async (username: string, password: string) => {
     try {
       console.log("dbAuth:", username);
       const data = await this.UserData.find({ username: username });

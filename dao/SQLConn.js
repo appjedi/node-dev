@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, QueryTypes } = require("Sequelize");
+const { Sequelize, DataTypes, QueryTypes } = require('Sequelize');
 
 let sequelize;
 
@@ -37,7 +37,7 @@ class SQLConn {
 
 //export default SQLConn;
 
-process.env.USER, process.env.PASSWORD;
+//process.env.USER, process.env.PASSWORD;
 
 const conn = {
   user: "",
@@ -49,16 +49,27 @@ const conn = {
     min: 0,
     idle: 10000,
   },
-  // Data is stored in the file `database.sqlite` in the folder `db`.
-  // Note that if you leave your app public, this database file will be copied if
-  // someone forks your app. So don't use it to store sensitive information.
+
   storage: "./data.db",
 };
+async function insertTest(un, pw)
+{
+  try {
+    const db = new SQLConn(conn);
 
+    const insert = `INSERT INTO users (username,password,role_id, status) VALUES(?,?, 1,1);`;
+    const values = [un,pw]
+    db.execute(insert,values);
+    console.log("user created.");
+  } catch (ex) {
+    console.log("error:", ex);
+  }
+}
 async function main()
 {
   const db = new SQLConn(conn);
   const rows = await db.query("SELECT * FROM users");
   console.log(rows);
 }
+//insertTest("karate", 'Kid2023!');
 main();

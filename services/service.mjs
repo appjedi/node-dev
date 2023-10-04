@@ -1,7 +1,7 @@
 const MyDAO = require("../dao/MyDAO.js");
 const MainDAO = require("../dao/MainDAO.js");
 const nodeMailer = require("nodemailer");
-const stripe = require("./stripe.mjs");
+const stripe = require("./stripe_v1.mjs");
 const GC_PRODUCTS = [
     { id: 1, name:"Patch",description: "Patch", price: 15 },
     { id: 2, name:"Gi with Patch",description: "Gi with Patch", price: 30 },

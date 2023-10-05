@@ -136,7 +136,7 @@ router.get("/api/products", async (ctx) => {
   console.log("products:", products);
   ctx.body = products;
 });
-router.post("/student", async (ctx) => {
+router.post("/student", async (ctx: Context) => {
   const s = ctx.request.body;
   console.log("POST STUDENT:", s);
   const resp = await service.createStudent(s);

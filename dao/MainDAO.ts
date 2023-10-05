@@ -398,7 +398,7 @@ class MainDAO {
     //const donations = data ? data.donations : [];
     return data;
   };
-  getUserById = async (id) => {
+  getUserById = async (id: string) => {
     const user = await this.UserData.findById(id);
     if (user) {
       return user;
@@ -406,7 +406,7 @@ class MainDAO {
       null;
     }
   };
-  getUserByEmail = async (email) => {
+  getUserByEmail = async (email: string) => {
     const data = await this.UserData.find({ email: email });
     if (data) {
       const u = data[0];
